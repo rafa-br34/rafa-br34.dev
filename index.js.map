@@ -1,0 +1,1 @@
+{"version":3,"file":"index.js","sources":["../src/index.ts"],"sourcesContent":["import \"../style/style.sass\"\n\nfunction Main() {\n\t// Placeholder\n\tconsole.log(\"eee\")\n}\n\nMain()"],"names":[],"mappings":"yBAEA,SAAS,IAAI,GAAA;AAEZ,IAAA,OAAO,CAAC,GAAG,CAAC,KAAK,CAAC;AACnB;AAEA,IAAI,EAAE"}
