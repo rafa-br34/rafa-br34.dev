@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "rollup -c",
+    "build-dev": "webpack serve --config webpack.config.mjs --mode development",
+    "build": "webpack --config webpack.config.mjs --mode production",
     "deploy": "gh-pages -d dist"
   },
   "keywords": [],
@@ -12,15 +13,24 @@
   "license": "MIT",
   "type": "commonjs",
   "devDependencies": {
-    "@rollup/plugin-node-resolve": "^16.0.1",
+    "@typescript-eslint/eslint-plugin": "^8.38.0",
+    "@typescript-eslint/parser": "^8.38.0",
+    "clean-webpack-plugin": "^4.0.0",
+    "copy-webpack-plugin": "^13.0.0",
+    "css-loader": "^7.1.2",
+    "eslint": "^9.31.0",
+    "eslint-webpack-plugin": "^5.0.2",
     "gh-pages": "^6.3.0",
-    "rollup": "^4.45.1",
-    "rollup-plugin-clear": "^2.0.7",
-    "rollup-plugin-copy": "^3.5.0",
-    "rollup-plugin-postcss": "^4.0.2",
-    "rollup-plugin-typescript2": "^0.36.0",
+    "html-webpack-plugin": "^5.6.3",
+    "mini-css-extract-plugin": "^2.9.2",
     "sass": "^1.89.2",
+    "sass-loader": "^16.0.5",
+    "style-loader": "^4.0.0",
+    "ts-loader": "^9.5.2",
     "tslib": "^2.8.1",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "webpack": "^5.100.2",
+    "webpack-cli": "^6.0.1",
+    "webpack-dev-server": "^5.2.2"
   }
 }
