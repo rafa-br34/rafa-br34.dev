@@ -27,12 +27,12 @@ const Pages = [
 	},
 	{
 		Source: "gallery.ejs",
-		Result: "gallery",
+		Result: "gallery.html",
 		Chunks: [ "gallery" ]
 	},
 	{
 		Source: "projects.ejs",
-		Result: "projects",
+		Result: "projects.html",
 		Chunks: [ "projects" ]
 	}
 ]
