@@ -13,24 +13,33 @@
   "license": "MIT",
   "type": "commonjs",
   "devDependencies": {
+    "@types/jquery": "^3.5.32",
     "@typescript-eslint/eslint-plugin": "^8.38.0",
     "@typescript-eslint/parser": "^8.38.0",
     "clean-webpack-plugin": "^4.0.0",
     "copy-webpack-plugin": "^13.0.0",
     "css-loader": "^7.1.2",
+    "ejs-loader": "^0.5.0",
+    "ejs-webpack-loader": "^2.2.2",
     "eslint": "^9.31.0",
     "eslint-webpack-plugin": "^5.0.2",
     "gh-pages": "^6.3.0",
+    "html-loader": "^5.1.0",
     "html-webpack-plugin": "^5.6.3",
     "mini-css-extract-plugin": "^2.9.2",
     "sass": "^1.89.2",
     "sass-loader": "^16.0.5",
     "style-loader": "^4.0.0",
+    "template-ejs-loader": "^0.9.4",
     "ts-loader": "^9.5.2",
     "tslib": "^2.8.1",
     "typescript": "^5.8.3",
     "webpack": "^5.100.2",
     "webpack-cli": "^6.0.1",
     "webpack-dev-server": "^5.2.2"
+  },
+  "dependencies": {
+    "jquery": "^3.7.1",
+    "yaml": "^2.8.1"
   }
 }

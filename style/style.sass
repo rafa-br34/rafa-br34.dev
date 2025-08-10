@@ -1,4 +1,4 @@
-.ui-fade
+.cs-banner-fade
 	position: absolute
 	bottom: 0
 	left: 0
@@ -6,7 +6,7 @@
 	height: 200px
 	background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, #222 100%)
 
-.ui-banner
+.cs-banner
 	width: 100%
 	height: 400px
 	image-rendering: pixelated
@@ -14,13 +14,51 @@
 	object-position: top
 	display: block
 
-.ui-grid-tiny
+.cs-grid-tiny
 	padding-left: 5px !important
 
-.ui-logo-small
+.cs-logo-small
 	width: 16px
 	height: 16px
 
-.ui-logo-big
+.cs-logo-big
 	width: 32px
 	height: 32px
+
+.cs-navbar
+	font-weight: 400 !important
+
+.cs-navbar-active
+	@extend .cs-navbar
+	color: #EEE !important
+
+.cs-gallery-image
+	&:hover
+		cursor: pointer
+
+.cs-gallery-overlay
+	position: fixed
+	inset: 0
+	z-index: 1200
+	display: none
+	background-color: rgba(0, 0, 0, 0.85)
+
+.cs-gallery-overlay.visible
+	display: block
+
+.cs-gallery-overlay-image
+	max-height: 80vh
+	width: auto
+	height: auto
+	object-fit: contain
+	display: block
+	margin: 0 auto
+
+.cs-gallery-mask
+	z-index: 2000
+	background: rgba(0,0,0,.7)
+	transition: opacity .25s ease
+
+.cs-gallery-mask.hidden
+	opacity: 0
+	pointer-events: none

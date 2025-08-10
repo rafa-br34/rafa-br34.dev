@@ -1,0 +1,51 @@
+# This file defines which artist made which artwork
+# It is written using YAML just for accessibility and to keep things tidy
+
+artists:
+  - name: "Gummi_art"
+    socials:
+      - link: https://www.furaffinity.net/user/gummiart
+        type: furaffinity
+      - link: https://bsky.app/profile/gummiart.bsky.social
+        type: bluesky
+      - link: https://patreon.com/Gummi_art
+        type: patreon
+    artworks:
+      - file: gummi_arts_banner.png
+        shape:
+          x: 1100
+          y: 440
+        type: gift
+        mirrors:
+          - https://e621.net/posts/5584954
+          - https://www.furaffinity.net/view/60919718/
+          - https://www.furaffinity.net/view/61820035/
+        dates:
+          creation: "2025-05-18"
+      - file: gummi_arts_stare.png
+        type: gift
+        shape:
+          x: 512
+          y: 512
+        mirrors:
+          - https://e621.net/posts/5605628
+          - https://www.furaffinity.net/view/61037995/
+        dates:
+          creation: "2025-05-18"
+
+  - name: "o_pastelzera"
+    socials:
+      - link: https://bsky.app/profile/opastelzera.bsky.social
+        type: bluesky
+    artworks:
+      - file: o_pastelzera_portrait.png
+        type: commission
+        shape:
+          x: 4096
+          y: 4096
+        mirrors:
+          - https://e621.net/posts/5763375
+          - https://www.furaffinity.net/view/61854486
+        dates:
+          commission: "2025-08-02"
+          creation: "2025-08-07"

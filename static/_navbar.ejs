@@ -1,0 +1,28 @@
+<%
+	const Pages = [
+		{
+			Page: "Home",
+			Link: "/",
+		},
+		{
+			Page: "Gallery",
+			Link: "/gallery"
+		},
+		{
+			Page: "Projects",
+			Link: "/projects"
+		}
+	]
+%>
+
+<nav class="uk-navbar-transparent uk-background-secondary" uk-navbar>
+	<div class="uk-container">
+		<div class="uk-navbar-left">
+			<ul class="uk-navbar-nav">
+				<% for (let PageEntry of Pages) { %>
+					<li><a class="cs-navbar <%- PageEntry.Page == Page ? 'cs-navbar-active' : '' -%>" href="<%- PageEntry.Link -%>"><%- PageEntry.Page -%></a></li>
+				<% } %>
+			</ul>
+		</div>
+	</div>
+</nav>

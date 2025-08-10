@@ -3,21 +3,52 @@ import ESLintWebpackPlugin    from "eslint-webpack-plugin"
 import { CleanWebpackPlugin } from "clean-webpack-plugin"
 import HtmlWebpackPlugin      from "html-webpack-plugin"
 import CopyWebpackPlugin      from "copy-webpack-plugin"
+import webpack                from "webpack"
 
 import { argv }          from "process"
 import path              from "path"
 import { fileURLToPath } from "url"
 
+import { htmlWebpackPluginTemplateCustomizer } from "template-ejs-loader"
+
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
+const Entries = {
+	"index": "./src/index.ts",
+	"gallery": "./src/gallery.ts",
+	"projects": "./src/projects.ts"
+}
+const Pages = [
+	{
+		Source: "index.ejs",
+		Result: "index.html",
+		Chunks: [ "index" ]
+	},
+	{
+		Source: "gallery.ejs",
+		Result: "gallery",
+		Chunks: [ "gallery" ]
+	},
+	{
+		Source: "projects.ejs",
+		Result: "projects",
+		Chunks: [ "projects" ]
+	}
+]
+
+for (let Page of Pages)
+	for (let Chunk of Page.Chunks)
+		if (!Entries[Chunk])
+			throw new Error(`Could not find source file for chunk "${Chunk}" in page "${Page.Source}"`)
+
 export default {
-	entry: "./src/index.ts",
+	entry: Entries,
 	mode: argv.mode,
 	devtool: "source-map",
 
 	output: {
-		filename: "js/index.js",
+		filename: "js/[name].bundle.js",
 		path: path.resolve(__dirname, "dist"),
 		clean: true
 	},
@@ -40,16 +71,43 @@ export default {
 					"css-loader",
 					"sass-loader"
 				]
+			},
+			{
+				test: /\.ejs$/i,
+				use: [
+					"html-loader",
+					"template-ejs-loader"
+				],
 			}
 		]
 	},
 	plugins: [
 		new CleanWebpackPlugin(),
 
-		new HtmlWebpackPlugin({
-			template: "static/index.html",
-			inject: "body",
-			scriptLoading: "defer"
+		new webpack.ProvidePlugin({
+			"$": "jquery",
+			jQuery: "jquery",
+		}),
+
+		...Pages.map((Value) => {
+			return new HtmlWebpackPlugin({
+				inject: "head",
+				scriptLoading: "defer",
+				filename: Value.Result,
+				chunks: Value.Chunks,
+				template: htmlWebpackPluginTemplateCustomizer({
+					templatePath: `./static/${Value.Source}`,
+
+					htmlLoaderOption:{
+						sources: false
+					},
+
+					templateEjsLoaderOption: {
+						root: "",
+						data: {}
+					}
+				}),
+			})
 		}),
 
 		new MiniCssExtractPlugin({
