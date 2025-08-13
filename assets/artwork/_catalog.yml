@@ -49,3 +49,14 @@ artists:
         dates:
           commission: "2025-08-02"
           creation: "2025-08-07"
+      - file: o_pastelzera_animation.gif
+        type: commission
+        shape:
+          x: 4096
+          y: 4096
+        mirrors:
+          - https://e621.net/posts/5774738
+          - https://www.furaffinity.net/view/61915195/
+        dates:
+          commission: "2025-08-02"
+          creation: "2025-08-12"
