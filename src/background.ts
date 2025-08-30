@@ -1,5 +1,5 @@
 import "../style/style.sass"
-import { ComputeKernelInterface, ComputeKernelLoader } from "./background_compute"
+import { ComputeKernelLoader } from "./background_compute"
 
 import $ from "jquery"
 
@@ -29,11 +29,6 @@ async function GetShaders(ShaderNames: string[]) {
 
 	return ShaderSources
 }
-
-function WaitFrame() {
-	return new Promise((Resolve, _Reject) => requestAnimationFrame(Resolve))
-}
-
 
 declare global {
 	interface Window {
@@ -299,6 +294,7 @@ async function Main() {
 		Context.bufferSubData(Context.ARRAY_BUFFER, 0, ParticleEntries)
 
 		Context.drawArraysInstanced(Context.TRIANGLES, 0, 3, ParticleCount)
+		
 		requestAnimationFrame(UpdateFrame)
 	}
 	UpdateFrame()

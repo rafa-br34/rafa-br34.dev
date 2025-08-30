@@ -1,6 +1,6 @@
 # Personal website
 
-Here you can find the source code for my own personal website, built with Webpack, UIkit, SASS, and EJS.
+Here you can find the source code for my own personal website, built with Webpack, UIkit, SASS, Emscripten, TypeScript, and EJS.
 
 ## Table of contents
 

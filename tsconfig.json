@@ -2,10 +2,10 @@
 	"compilerOptions": {
 		"allowJs": true,
 		"experimentalDecorators": true,
-		"module": "esnext",
+		"module": "nodenext",
 		"lib": ["es2023", "dom"],
 		"target": "es2023",
-		"moduleResolution": "Node",
+		"moduleResolution": "nodenext",
 		"outDir": "build",
 		"baseUrl": "src/",
 		"strict": true,
