@@ -5,9 +5,17 @@
 
 <body>
 	<%- include("./_navbar.ejs", { Page: "Projects" }) -%>
-	<div class="uk-light uk-background-secondary uk-flex uk-flex-center uk-flex-middle" uk-height-viewport="expand: true">
-		<h1>Coming soon™</h1>
+
+	<div class="cs-transparent uk-light uk-background-secondary uk-flex uk-flex-center uk-flex-middle" uk-height-viewport="expand: true">
+		<div class="uk-container uk-text-center">
+			<h1>Coming soon™</h1>
+			<div>
+				<p>In the meanwhile you can have this simulation</p>
+			</div>
+		</div>
+
 	</div>
+	<canvas id="InteractiveBackground" class="cs-overlay-background" style="z-index: -1;"></canvas>
 	<%- include("./_footer.ejs") %>
 </body>
 </html>

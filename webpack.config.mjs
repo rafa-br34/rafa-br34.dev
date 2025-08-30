@@ -17,23 +17,29 @@ const __dirname = path.dirname(__filename)
 const Entries = {
 	"index": "./src/index.ts",
 	"gallery": "./src/gallery.ts",
-	"projects": "./src/projects.ts"
+	"projects": "./src/projects.ts",
+	"background": "./src/background.ts"
 }
 const Pages = [
 	{
 		Source: "index.ejs",
 		Result: "index.html",
-		Chunks: [ "index" ]
+		Chunks: [ "index", "background" ]
 	},
 	{
 		Source: "gallery.ejs",
 		Result: "gallery.html",
-		Chunks: [ "gallery" ]
+		Chunks: [ "gallery", "background" ]
 	},
 	{
 		Source: "projects.ejs",
 		Result: "projects.html",
-		Chunks: [ "projects" ]
+		Chunks: [ "projects", "background" ]
+	},
+	{
+		Source: "background.ejs",
+		Result: "background.html",
+		Chunks: [ "background" ]
 	}
 ]
 
@@ -46,7 +52,6 @@ export default {
 	entry: Entries,
 	mode: argv.mode,
 	devtool: "source-map",
-
 	output: {
 		filename: "js/[name].bundle.js",
 		path: path.resolve(__dirname, "dist"),
@@ -54,7 +59,7 @@ export default {
 	},
 
 	resolve: {
-		extensions: [".ts", ".js"]
+		extensions: [".tsx", ".ts", ".js"]
 	},
 
 	module: {
@@ -119,6 +124,7 @@ export default {
 				{ from: "assets", to: "assets" },
 				{ from: "static/robots.txt", to: "" },
 				{ from: "static/CNAME", to: "" },
+				{ from: "src/**/*.wasm", to: "js/[name][ext]" },
 			]
 		}),
 
@@ -134,5 +140,10 @@ export default {
 		port: 3000,
 		hot: true,
 		open: true
+	},
+
+	experiments: {
+		asyncWebAssembly: true,
+		topLevelAwait: true
 	}
 };
