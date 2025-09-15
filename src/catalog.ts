@@ -5,7 +5,7 @@ interface SocialMedia {
 
 interface Artwork {
 	file: string,
-	type: ["gift", "commission"]
+	type: ["gift", "commission", "request"]
 	mirrors: string[],
 	shape: {
 		x: number,
@@ -13,7 +13,8 @@ interface Artwork {
 	},
 	dates: {
 		commission?: string,
-		creation?: string
+		creation?: string,
+		request?: string
 	}
 }
 

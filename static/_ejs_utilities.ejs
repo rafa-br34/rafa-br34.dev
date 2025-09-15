@@ -1,0 +1,13 @@
+<%
+	function GenerateProperties(Properties) {
+		console.log(Properties)
+		let Results = []
+
+		for (let [Key, Val] of Object.entries(Properties))
+			Results.push(`${Key}="${Val}"`)
+
+		return Results.join(' ')
+	}
+
+	ejs_globals = { GenerateProperties }
+%>
