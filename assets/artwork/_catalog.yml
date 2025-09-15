@@ -60,3 +60,20 @@ artists:
         dates:
           commission: "2025-08-02"
           creation: "2025-08-12"
+
+  - name: "fingerprint"
+    socials:
+      - link: https://www.furaffinity.net/user/fingerprint/
+        type: furaffinity
+    artworks:
+      - file: fingerprint_ibm_z17.png
+        type: request
+        shape:
+          x: 3000
+          y: 4200
+        mirrors:
+          - https://e621.net/posts/5843252
+          - https://www.furaffinity.net/view/62281088/
+        dates:
+          request: "2025-05-19"
+          creation: "2025-09-14"
