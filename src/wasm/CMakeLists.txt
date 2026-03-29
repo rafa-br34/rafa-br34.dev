@@ -24,6 +24,5 @@ target_link_options(background_compute PRIVATE
 	"-sEXPORTED_RUNTIME_METHODS=['HEAPU8','HEAPF32','HEAP32','HEAPU32']"
 	"-sALLOW_MEMORY_GROWTH=1"
 	"-sENVIRONMENT=web"
-	"-gsource-map"
 )
 

@@ -135,6 +135,7 @@ EMSCRIPTEN_KEEPALIVE void compute_kernel_fast(
 
 
 	// Fourth pass, write sentinels
+#pragma clang loop unroll_count(16)
 	for (size_t i = 0; i < cell_count; i++) {
 		size_t value = write_position[i];
 		flat_array[i * pitch_extra + value] = SENTINEL_VALUE;
@@ -154,13 +155,14 @@ EMSCRIPTEN_KEEPALIVE void compute_kernel_fast(
 		size_t neighbor_count = 0;
 
 		// Search surrounding neighbors
-#pragma clang loop unroll_count(3)
+#pragma clang loop unroll(full)
 		for (int oy = -1; oy <= 1; oy++) {
-#pragma clang loop unroll_count(3)
+			int ny = wrap_integer(cy + oy, cell_last_y);
+			int row_offset = ny * cell_length_x;
+
+#pragma clang loop unroll(full)
 			for (int ox = -1; ox <= 1; ox++) {
-				int nx = wrap_integer(cx + ox, cell_last_x);
-				int ny = wrap_integer(cy + oy, cell_last_y);
-				int nid = ny * cell_length_x + nx;
+				int nid = row_offset + wrap_integer(cx + ox, cell_last_x);
 
 				if (flat_array[(size_t)nid * pitch_extra] != SENTINEL_VALUE)
 					neighbor_indexes[neighbor_count++] = nid;
@@ -179,8 +181,7 @@ EMSCRIPTEN_KEEPALIVE void compute_kernel_fast(
 			float ay = particle_pos_y[index_a];
 
 			for (size_t n = 0; n < neighbor_count; n++) {
-#pragma clang loop vectorize(enable) interleave(enable)
-#pragma clang loop unroll_count(16)
+#pragma clang loop unroll_count(8)
 				// Iterate array data (B)
 				for (size_t* pointer_b = &flat_array[neighbor_indexes[n] * pitch_extra]; *pointer_b != SENTINEL_VALUE; pointer_b++) {
 					size_t index_b = *pointer_b;
@@ -223,8 +224,7 @@ EMSCRIPTEN_KEEPALIVE void compute_kernel_fast(
 
 
 	// Sixth pass, write back
-#pragma clang loop vectorize(enable) interleave(enable)
-#pragma clang loop unroll_count(24)
+#pragma clang loop unroll_count(32)
 	for (size_t i = 0; i < particle_count; i++) {
 		float x = particle_pos_x[i] + particle_vel_x[i] * time_delta;
 		float y = particle_pos_y[i] + particle_vel_y[i] * time_delta;
@@ -261,7 +261,7 @@ EMSCRIPTEN_KEEPALIVE void compute_kernel_naive(
 ) {
 	const float force_range_sqr = force_range * force_range;
 
-#pragma clang loop unroll_count(8)
+	//#pragma clang loop unroll_count(8)
 	for (int a = 0; a < particle_count; a++) {
 		float
 			tx = 0.f,
@@ -273,7 +273,7 @@ EMSCRIPTEN_KEEPALIVE void compute_kernel_naive(
 
 		const int type_a = particle_types[a] * matrix_size;
 
-#pragma clang loop unroll_count(16)
+		//#pragma clang loop unroll_count(16)
 		for (int b = 0; b < particle_count; b++) {
 			if (a == b)
 				continue;
@@ -301,8 +301,8 @@ EMSCRIPTEN_KEEPALIVE void compute_kernel_naive(
 		particle_vel_y[a] *= force_dampening;
 	}
 
-#pragma clang loop vectorize(enable) interleave(enable)
-#pragma clang loop unroll_count(24)
+	//#pragma clang loop vectorize(enable) interleave(enable)
+	//#pragma clang loop unroll_count(24)
 	for (int i = 0; i < particle_count; i++) {
 
 		float x = particle_pos_x[i] + particle_vel_x[i] * time_delta;
