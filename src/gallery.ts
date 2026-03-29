@@ -1,11 +1,10 @@
-import "../style/style.sass"
+import "../style/style.scss"
 import Logos from "./social_media.json"
 
 import $ from "jquery"
 import yaml from "yaml"
 
-import { Catalog, Artist, Artwork, GetResource, GetAlternative } from "./catalog"
-
+import { Artist, Artwork, Catalog, GetAlternative, GetResource } from "./catalog"
 
 function TrimLink(URL: string) {
 	return URL
@@ -20,12 +19,12 @@ function CreateOverlayField(Title: string, Content: string) {
 		.addClass("uk-margin-remove")
 		.append(
 			$("<span>")
-			.text(Title)
+				.text(Title),
 		)
 		.append(
 			$("<span>")
-			.addClass("uk-text-emphasis")
-			.text(Content)
+				.addClass("uk-text-emphasis")
+				.text(Content),
 		)
 }
 
@@ -43,7 +42,7 @@ function CreateOverlayMedia(Link: string, Type: string) {
 			$("<img>")
 				.attr("src", Source)
 				.attr("alt", Type)
-				.addClass("cs-logo-big")
+				.addClass("cs-logo-big"),
 		)
 }
 
@@ -55,7 +54,6 @@ function CreateOverlayMirror(Link: string) {
 		.attr("uk-icon", "link-external")
 		.text(TrimLink(Link))
 		.add($("<br>"))
-		
 }
 
 function CloseOverlay() {
@@ -65,15 +63,16 @@ function CloseOverlay() {
 
 function OpenOverlay(Item_Artist: Artist, Item_Artwork: Artwork) {
 	$("#OverlayTitle").text(Item_Artwork.file)
-	
+
 	// Setup details
 	let DetailsFrag = $(document.createDocumentFragment())
 
 	DetailsFrag.append(CreateOverlayField("Artist: ", Item_Artist.name))
 	DetailsFrag.append(CreateOverlayField("Size: ", `${Item_Artwork.shape.x}x${Item_Artwork.shape.y}`))
 
-	for (let [Key, Val] of Object.entries((Item_Artwork.dates as Record<string, string>)))
+	for (let [Key, Val] of Object.entries(Item_Artwork.dates as Record<string, string>)) {
 		DetailsFrag.append(CreateOverlayField(`Date of ${Key}: `, Val))
+	}
 
 	$("#OverlayDetails")
 		.empty()
@@ -82,8 +81,9 @@ function OpenOverlay(Item_Artist: Artist, Item_Artwork: Artwork) {
 	// Setup socials
 	let SocialsFrag = $(document.createDocumentFragment())
 
-	for (let Social of Item_Artist.socials)
+	for (let Social of Item_Artist.socials) {
 		SocialsFrag.append(CreateOverlayMedia(Social.link, Social.type))
+	}
 
 	$("#OverlaySocials")
 		.empty()
@@ -92,8 +92,9 @@ function OpenOverlay(Item_Artist: Artist, Item_Artwork: Artwork) {
 	// Setup mirrors
 	let MirrorsFrag = $(document.createDocumentFragment())
 
-	for (let Mirror of Item_Artwork.mirrors)
+	for (let Mirror of Item_Artwork.mirrors) {
 		MirrorsFrag.append(CreateOverlayMirror(Mirror))
+	}
 
 	$("#OverlayMirrors")
 		.empty()
@@ -115,30 +116,30 @@ function OpenOverlay(Item_Artist: Artist, Item_Artwork: Artwork) {
 			Spinner.attr("hidden", "")
 		})
 		.each(function() {
-			if((this as HTMLImageElement).complete)
+			if ((this as HTMLImageElement).complete) {
 				$(this).trigger("load")
+			}
 		})
 		.attr("src", GetResource(Item_Artwork))
 		.attr("alt", GetAlternative(Item_Artist, Item_Artwork))
 }
 
 function CreateEntry(Item_Artist: Artist, Item_Artwork: Artwork) {
-	let ImageElement =
-		$(
-			"<img>",
-			{
-				src: GetResource(Item_Artwork),
-				alt: GetAlternative(Item_Artist, Item_Artwork),
-				loading: "lazy"
-			}
-		)
+	let ImageElement = $(
+		"<img>",
+		{
+			src: GetResource(Item_Artwork),
+			alt: GetAlternative(Item_Artist, Item_Artwork),
+			loading: "lazy",
+		},
+	)
 		.addClass("uk-border-rounded uk-transition-scale-up uk-transition-opaque uk-width-1-1 cs-gallery-image")
 		.data({ Item_Artist, Item_Artwork })
 
 	return $("<div>").append(
 		$("<div>")
-		.addClass("uk-border-rounded uk-inline-clip uk-transition-toggle")
-		.append(ImageElement)
+			.addClass("uk-border-rounded uk-inline-clip uk-transition-toggle")
+			.append(ImageElement),
 	)
 }
 
@@ -147,9 +148,11 @@ function ProcessCatalog(Response: string) {
 
 	let Entries: Catalog = yaml.parse(Response)
 
-	for (let Item_Artist of Entries.artists)
-		for (let Item_Artwork of Item_Artist.artworks)
+	for (let Item_Artist of Entries.artists) {
+		for (let Item_Artwork of Item_Artist.artworks) {
 			Fragment.append(CreateEntry(Item_Artist, Item_Artwork))
+		}
+	}
 
 	$("#GalleryGrid").append(Fragment)
 	$("#GalleryMask").addClass("hidden")
@@ -158,7 +161,7 @@ function ProcessCatalog(Response: string) {
 function Main() {
 	$.get("/assets/artwork/_catalog.yml", ProcessCatalog)
 
-	$("#GalleryGrid").on("click", ".cs-gallery-image", function () {
+	$("#GalleryGrid").on("click", ".cs-gallery-image", function() {
 		const { Item_Artist, Item_Artwork } = $(this).data()
 		OpenOverlay(Item_Artist, Item_Artwork)
 	})

@@ -1,0 +1,15 @@
+{
+	"version": 3,
+	"configurePresets": [
+		{
+			"name": "wasm",
+			"displayName": "WebAssembly Build",
+			"generator": "Ninja",
+			"binaryDir": "${sourceDir}/build",
+			"cacheVariables": {
+				"CMAKE_TOOLCHAIN_FILE": "$env{EMSDK}/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake",
+				"CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+			}
+		}
+	]
+}

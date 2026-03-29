@@ -1,0 +1,22 @@
+{
+	"configurations": [
+		{
+			"name": "Emscripten",
+			"compileCommands": "${workspaceFolder}/src/wasm/build/compile_commands.json",
+			"compilerPath": "${env:EMSDK}/upstream/bin/clang",
+			"intelliSenseMode": "linux-clang-x86",
+			"compilerArgs": [
+				"--target=wasm32-unknown-emscripten",
+				"--sysroot=${env:EMSDK}/upstream/emscripten/cache/sysroot"
+			],
+			"defines": [
+				"__EMSCRIPTEN__",
+				"__wasm__",
+				"__wasm32__"
+			],
+			"cStandard": "c17",
+			"cppStandard": "c++17"
+		}
+	],
+	"version": 4
+}

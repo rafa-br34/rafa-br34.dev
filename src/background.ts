@@ -1,4 +1,4 @@
-import "../style/style.sass"
+import "../style/style.scss"
 import { ComputeKernelLoader } from "./background_compute"
 
 import $ from "jquery"
@@ -10,7 +10,7 @@ function CreateShader(Context: WebGL2RenderingContext, Source: string, Type: GLe
 	Context.compileShader(ShaderHandle)
 
 	if (!Context.getShaderParameter(ShaderHandle, Context.COMPILE_STATUS)) {
-		throw Error(`Shader compilation failed\n${Context.getShaderInfoLog(ShaderHandle)}`)
+		throw new Error(`Shader compilation failed\n${Context.getShaderInfoLog(ShaderHandle)}`)
 	}
 
 	return ShaderHandle
@@ -20,10 +20,11 @@ async function GetShaders(ShaderNames: string[]) {
 	let Coroutines = []
 	let ShaderSources: Record<string, string> = {}
 
-	for (let Filename of ShaderNames)
+	for (let Filename of ShaderNames) {
 		Coroutines.push(
-			$.get(`assets/shaders/${Filename}`).done(Source => ShaderSources[Filename] = Source as string)
+			$.get(`assets/shaders/${Filename}`).done(Source => ShaderSources[Filename] = Source as string),
 		)
+	}
 
 	await Promise.allSettled(Coroutines)
 
@@ -43,14 +44,16 @@ async function Main() {
 
 	let JQueryCanvas = $("#InteractiveBackground")
 
-	if (!JQueryCanvas.length)
+	if (!JQueryCanvas.length) {
 		return
+	}
 
 	let Canvas = JQueryCanvas[0] as HTMLCanvasElement
 	let Context = Canvas.getContext("webgl2", { premultipliedAlpha: true, alpha: true })
 
-	if (!Context)
-		throw Error("Failed to get context")
+	if (!Context) {
+		throw new Error("Failed to get context")
+	}
 
 	let Shaders = await GetShaders([
 		"background_fragment.frag",
@@ -63,8 +66,9 @@ async function Main() {
 	Context.linkProgram(Program)
 	Context.useProgram(Program)
 
-	if (!Context.getProgramParameter(Program, Context.LINK_STATUS))
-		throw Error(`Linking failed:\n${Context.getProgramInfoLog(Program)}`)
+	if (!Context.getProgramParameter(Program, Context.LINK_STATUS)) {
+		throw new Error(`Linking failed:\n${Context.getProgramInfoLog(Program)}`)
+	}
 
 	Context.disable(Context.DITHER)
 
@@ -78,43 +82,52 @@ async function Main() {
 	Context.frontFace(Context.CCW)
 
 	// Enable transparency blending
-	Context.enable(Context.BLEND);
+	Context.enable(Context.BLEND)
 	Context.blendFunc(Context.SRC_ALPHA, Context.ONE_MINUS_SRC_ALPHA)
-	Context.blendEquation(Context.FUNC_ADD);
+	Context.blendEquation(Context.FUNC_ADD)
 
 	Context.clearColor(0, 0, 0, 0)
 	Context.clear(Context.COLOR_BUFFER_BIT)
 
 	let u_Scaling = Context.getUniformLocation(Program, "u_Scaling")
-	let u_Size = Context.getUniformLocation(Program, "u_Size")
+	let u_Radius = Context.getUniformLocation(Program, "u_Radius")
 
 	let a_Model = Context.getAttribLocation(Program, "a_Model")
 	let a_Properties = Context.getAttribLocation(Program, "a_Properties")
-	let a_Positional = Context.getAttribLocation(Program, "a_Positional")
+	let a_Position_X = Context.getAttribLocation(Program, "a_Position_X")
+	let a_Position_Y = Context.getAttribLocation(Program, "a_Position_Y")
 
 	let Scaling_X = 0
 	let Scaling_Y = 0
 
 	let Model = new Float32Array([
-		 0, 2,
-		 Math.sqrt(3), -1,
-		-Math.sqrt(3), -1,
+		0,
+		2,
+		Math.sqrt(3),
+		-1,
+		-Math.sqrt(3),
+		-1,
 	])
 
-	const ScaleMultiplier = 32768
+	const ScaleMultiplier = 1024 * 40
 	const ParticleMatrixSize = 6
-	const ParticleCount = 3000
-	const ParticleSize = 128.0
+	const ParticleCount = 1024 * 8
+	const ParticleSize = 128
 
-	let Size_ParticleEntries = ParticleCount * 4
 	let Size_ParticleMatrix = ParticleMatrixSize * ParticleMatrixSize
 	let Size_ParticleTypes = ParticleCount
 
-	let Alloc_ParticleEntries = ComputeKernel._malloc(Float32Array.BYTES_PER_ELEMENT * Size_ParticleEntries)
+	let Alloc_ParticlePosX = ComputeKernel._malloc(Float32Array.BYTES_PER_ELEMENT * ParticleCount)
+	let Alloc_ParticlePosY = ComputeKernel._malloc(Float32Array.BYTES_PER_ELEMENT * ParticleCount)
+	let Alloc_ParticleVelX = ComputeKernel._malloc(Float32Array.BYTES_PER_ELEMENT * ParticleCount)
+	let Alloc_ParticleVelY = ComputeKernel._malloc(Float32Array.BYTES_PER_ELEMENT * ParticleCount)
 	let Alloc_ParticleMatrix = ComputeKernel._malloc(Float32Array.BYTES_PER_ELEMENT * Size_ParticleMatrix)
 	let Alloc_ParticleTypes = ComputeKernel._malloc(Uint8Array.BYTES_PER_ELEMENT * Size_ParticleTypes)
 
-	let ParticleEntries = new Float32Array(ComputeKernel.HEAPF32.buffer, Alloc_ParticleEntries, Size_ParticleEntries)
+	let ParticlePosX = new Float32Array(ComputeKernel.HEAPF32.buffer, Alloc_ParticlePosX, ParticleCount)
+	let ParticlePosY = new Float32Array(ComputeKernel.HEAPF32.buffer, Alloc_ParticlePosY, ParticleCount)
+	let ParticleVelX = new Float32Array(ComputeKernel.HEAPF32.buffer, Alloc_ParticleVelX, ParticleCount)
+	let ParticleVelY = new Float32Array(ComputeKernel.HEAPF32.buffer, Alloc_ParticleVelY, ParticleCount)
 	let ParticleMatrix = new Float32Array(ComputeKernel.HEAPF32.buffer, Alloc_ParticleMatrix, Size_ParticleMatrix)
 	let ParticleTypes = new Uint8Array(ComputeKernel.HEAPU8.buffer, Alloc_ParticleTypes, Size_ParticleTypes)
 
@@ -122,19 +135,36 @@ async function Main() {
 		ParticleMatrix[i] = 2 * Math.random() - 1
 	}
 
-	for (let i = 0; i < ParticleCount; i++) {
-		let Rotation = Math.random() * Math.PI * 2
-		let Radius = Math.random() * 1024
+	const Half = ParticleCount / 2
 
-		ParticleEntries[i * 4 + 0] = Math.sin(Rotation) * Radius
-		ParticleEntries[i * 4 + 1] = Math.cos(Rotation) * Radius
+	for (let i = 0; i < Half; i++) {
+		let Rotation = Math.random() * Math.PI * 2
+		let Radius = Math.random() * 1024 * 4
+
+		ParticlePosX[i] = Math.sin(Rotation) * Radius
+		ParticlePosY[i] = Math.cos(Rotation) * Radius
 		ParticleTypes[i] = Math.floor(Math.random() * ParticleMatrixSize)
 	}
 
-	window.particle_entries = ParticleEntries
-	window.particle_matrix = ParticleMatrix
-	window.particle_types = ParticleTypes
+	for (let i = 0; i < Half; i++) {
+		let Rotation = Math.random() * Math.PI * 2
+		let Radius = Math.random() * ScaleMultiplier
 
+		ParticlePosX[i + Half] = Math.sin(Rotation) * Radius
+		ParticlePosY[i + Half] = Math.cos(Rotation) * Radius
+		ParticleTypes[i + Half] = Math.floor(Math.random() * ParticleMatrixSize)
+	}
+
+	;(globalThis as any).particle_arrays = [
+		ParticlePosX,
+		ParticlePosY,
+		ParticleVelX,
+		ParticleVelY,
+	]
+	;(globalThis as any).particle_matrix = ParticleMatrix
+	;(globalThis as any).particle_types = ParticleTypes
+
+	// @todo For the love of god abstract this asap
 	// Create access pointer
 	let VAO_Pointer = Context.createVertexArray()
 	Context.bindVertexArray(VAO_Pointer)
@@ -149,15 +179,29 @@ async function Main() {
 	Context.vertexAttribPointer(a_Model, 2, Context.FLOAT, false, 0, 0)
 	Context.vertexAttribDivisor(a_Model, 0)
 
-	// Create particle instances
-	let VBO_ParticleEntries = Context.createBuffer()
-	Context.bindBuffer(Context.ARRAY_BUFFER, VBO_ParticleEntries)
-	Context.bufferData(Context.ARRAY_BUFFER, ParticleEntries, Context.STREAM_DRAW)
+	/*
+	 * Position X and Y
+	 */
+
+	// Create particle instances position x
+	let VBO_ParticlePosX = Context.createBuffer()
+	Context.bindBuffer(Context.ARRAY_BUFFER, VBO_ParticlePosX)
+	Context.bufferData(Context.ARRAY_BUFFER, ParticlePosX, Context.STREAM_DRAW)
 
 	// Link particles to pipeline
-	Context.enableVertexAttribArray(a_Positional)
-	Context.vertexAttribPointer(a_Positional, 4, Context.FLOAT, false, 0, 0)
-	Context.vertexAttribDivisor(a_Positional, 1)
+	Context.enableVertexAttribArray(a_Position_X)
+	Context.vertexAttribPointer(a_Position_X, 1, Context.FLOAT, false, 0, 0)
+	Context.vertexAttribDivisor(a_Position_X, 1)
+
+	// Create particle instances position y
+	let VBO_ParticlePosY = Context.createBuffer()
+	Context.bindBuffer(Context.ARRAY_BUFFER, VBO_ParticlePosY)
+	Context.bufferData(Context.ARRAY_BUFFER, ParticlePosY, Context.STREAM_DRAW)
+
+	// Link particles to pipeline
+	Context.enableVertexAttribArray(a_Position_Y)
+	Context.vertexAttribPointer(a_Position_Y, 1, Context.FLOAT, false, 0, 0)
+	Context.vertexAttribDivisor(a_Position_Y, 1)
 
 	// Create particle types
 	let VBO_ParticleTypes = Context.createBuffer()
@@ -169,7 +213,6 @@ async function Main() {
 	Context.vertexAttribIPointer(a_Properties, 1, Context.UNSIGNED_BYTE, 0, 0)
 	Context.vertexAttribDivisor(a_Properties, 1)
 
-
 	function UpdateSize() {
 		let CX = JQueryCanvas.width()
 		let CY = JQueryCanvas.height()
@@ -179,8 +222,7 @@ async function Main() {
 
 		Context.viewport(0, 0, CX, CY)
 
-		let
-			RX = 0,
+		let RX = 0,
 			RY = 0
 
 		if (CX < CY) {
@@ -196,12 +238,12 @@ async function Main() {
 		Scaling_Y = RY
 
 		Context.uniform2f(u_Scaling, RX, RY)
-		Context.uniform1f(u_Size, ParticleSize)
+		Context.uniform1f(u_Radius, ParticleSize)
 	}
 
 	window.addEventListener("resize", UpdateSize)
 	UpdateSize()
-	
+
 	// @todo Experiment this further or ditch the idea
 	/*
 	let Tuning_Size = 32
@@ -210,20 +252,48 @@ async function Main() {
 	let Tuning_Index = 0
 	*/
 
-	function UpdateFrame() {
-		ComputeKernel._compute_kernel(
-			Alloc_ParticleMatrix,     // matrix_values: number,    // FP32*
-			ParticleMatrixSize,       // matrix_size: number,      // INT
-			Alloc_ParticleTypes,      // particle_types: number,   // UI8*
-			Alloc_ParticleEntries,    // particle_entries: number, // FP32*
-			ParticleCount,            // particle_count: number,   // INT
-			2048.0,                   // force_range: number,      // FP32
-			2.0,                      // force_multiplier: number, // FP32
-			0.90,                     // force_dampening: number,  // FP32
-			0.3,                      // force_beta: number,       // FP32
-			2.0,                      // time_delta: number,       // FP32
-			Scaling_X + ParticleSize, // canvas_scaling_x: number, // FP32
-			Scaling_Y + ParticleSize  // canvas_scaling_y: number  // FP32
+	let LastFrame = performance.now()
+
+	const Speed = 1.75 / (1 / 75)
+
+	function UpdateFrame(CurrFrame: number = 0) {
+		const Delta = Math.max((CurrFrame - LastFrame) / 1000, 0)
+		const TimeStep = Math.min(Speed * Delta, 2)
+
+		LastFrame = CurrFrame /*
+		matrix_values: number, // float*
+		matrix_size: number, // size_t
+		particle_types: number, // uint8_t*
+		particle_pos_x: number, // float*
+		particle_pos_y: number, // float*
+		particle_vel_x: number, // float*
+		particle_vel_y: number, // float*
+		particle_count: number, // size_t
+		force_beta: number, // float
+		force_range: number, // float
+		force_dampening: number, // float
+		force_multiplier: number, // float
+		time_delta: number, // float
+		world_size_x: number, // float
+		world_size_y: number, // float
+		*/
+
+		ComputeKernel._compute_kernel_fast(
+			Alloc_ParticleMatrix,
+			ParticleMatrixSize,
+			Alloc_ParticleTypes,
+			Alloc_ParticlePosX,
+			Alloc_ParticlePosY,
+			Alloc_ParticleVelX,
+			Alloc_ParticleVelY,
+			ParticleCount,
+			0.3, // force_beta
+			2048, // force_range
+			0.9, // force_dampening
+			2, // force_multiplier
+			TimeStep,
+			Scaling_X + ParticleSize,
+			Scaling_Y + ParticleSize,
 		)
 
 		/*
@@ -235,7 +305,7 @@ async function Main() {
 		Tuning_Entries[Tuning_Index * 4 + 2] = ParticleEntries[Tuning_Objective * + 2]
 		Tuning_Entries[Tuning_Index * 4 + 3] = ParticleEntries[Tuning_Objective * + 3]
 		Tuning_Types[Tuning_Index] = ParticleTypes[Tuning_Objective]
-		
+
 		if (Tuning_Index >= Tuning_Size) {
 			let Scores = new Array(ParticleMatrixSize)
 
@@ -246,7 +316,7 @@ async function Main() {
 
 			for (let i = 0; i < Tuning_Size; i++) {
 				let Type = Tuning_Types[i]
-				
+
 				let PX = Tuning_Entries[i * 4 + 0]
 				let PY = Tuning_Entries[i * 4 + 1]
 
@@ -290,11 +360,16 @@ async function Main() {
 		Context.clearColor(0, 0, 0, 0)
 		Context.clear(Context.COLOR_BUFFER_BIT)
 
-		Context.bindBuffer(Context.ARRAY_BUFFER, VBO_ParticleEntries)
-		Context.bufferSubData(Context.ARRAY_BUFFER, 0, ParticleEntries)
+		Context.bindBuffer(Context.ARRAY_BUFFER, VBO_ParticlePosX)
+		Context.bufferSubData(Context.ARRAY_BUFFER, 0, ParticlePosX)
+
+		Context.bindBuffer(Context.ARRAY_BUFFER, VBO_ParticlePosY)
+		Context.bufferSubData(Context.ARRAY_BUFFER, 0, ParticlePosY)
+
+		Context.bindBuffer(Context.ARRAY_BUFFER, VBO_ParticleTypes)
 
 		Context.drawArraysInstanced(Context.TRIANGLES, 0, 3, ParticleCount)
-		
+
 		requestAnimationFrame(UpdateFrame)
 	}
 	UpdateFrame()

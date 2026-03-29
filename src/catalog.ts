@@ -1,26 +1,26 @@
 interface SocialMedia {
-	link: string,
+	link: string
 	type: string
 }
 
 interface Artwork {
-	file: string,
+	file: string
 	type: ["gift", "commission", "request"]
-	mirrors: string[],
+	mirrors: string[]
 	shape: {
-		x: number,
+		x: number
 		y: number
-	},
+	}
 	dates: {
-		commission?: string,
-		creation?: string,
+		commission?: string
+		creation?: string
 		request?: string
 	}
 }
 
 interface Artist {
-	name: string,
-	socials: SocialMedia[],
+	name: string
+	socials: SocialMedia[]
 	artworks: Artwork[]
 }
 
@@ -36,12 +36,4 @@ function GetAlternative(Item_Artist: Artist, Item_Artwork: Artwork) {
 	return `${Item_Artwork.type} from ${Item_Artist.name} titled ${Item_Artwork.file}`
 }
 
-
-export {
-	SocialMedia,
-	Artwork,
-	Artist,
-	Catalog,
-	GetResource,
-	GetAlternative
-}
+export { Artist, Artwork, Catalog, GetAlternative, GetResource, SocialMedia }

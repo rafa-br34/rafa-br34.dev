@@ -8,11 +8,11 @@ module.exports = {
 	],
 	env: {
 		browser: true,
-		es2021: true
+		es2021: true,
 	},
 	rules: {
-		semi: ["error", "always"],
-		quotes: ["error", "double"],
-		"prettier/prettier": "error"
-	}
+		"semi": ["error", "always"],
+		"quotes": ["error", "double"],
+		"prettier/prettier": "error",
+	},
 }

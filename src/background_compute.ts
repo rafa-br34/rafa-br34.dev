@@ -1,26 +1,45 @@
 import compute_kernel_loader from "./wasm/background_compute"
 
-
 export interface ComputeKernelInterface {
-	HEAPU8: Uint8Array,
-	HEAPF32: Float32Array,
-	HEAP32: Int32Array,
-	HEAPU32: Uint32Array,
-	_malloc(size: number): number,
-	_free(ptr: number): void,
-	_compute_kernel(
-		matrix_values: number,    // FP32*
-		matrix_size: number,      // INT
-		particle_types: number,   // UI8*
-		particle_entries: number, // FP32*
-		particle_count: number,   // INT
-		force_range: number,      // FP32
-		force_multiplier: number, // FP32
-		force_dampening: number,  // FP32
-		force_beta: number,       // FP32
-		time_delta: number,       // FP32
-		canvas_scaling_x: number, // FP32
-		canvas_scaling_y: number, // FP32
+	HEAPU8: Uint8Array
+	HEAPF32: Float32Array
+	HEAP32: Int32Array
+	HEAPU32: Uint32Array
+	_malloc(size: number): number
+	_free(ptr: number): void
+	_compute_kernel_fast(
+		matrix_values: number, // float*
+		matrix_size: number, // size_t
+		particle_types: number, // uint8_t*
+		particle_pos_x: number, // float*
+		particle_pos_y: number, // float*
+		particle_vel_x: number, // float*
+		particle_vel_y: number, // float*
+		particle_count: number, // size_t
+		force_beta: number, // float
+		force_range: number, // float
+		force_dampening: number, // float
+		force_multiplier: number, // float
+		time_delta: number, // float
+		world_size_x: number, // float
+		world_size_y: number, // float
+	): void
+	_compute_kernel_naive(
+		matrix_values: number, // float*
+		matrix_size: number, // size_t
+		particle_types: number, // uint8_t*
+		particle_pos_x: number, // float*
+		particle_pos_y: number, // float*
+		particle_vel_x: number, // float*
+		particle_vel_y: number, // float*
+		particle_count: number, // size_t
+		force_beta: number, // float
+		force_range: number, // float
+		force_dampening: number, // float
+		force_multiplier: number, // float
+		time_delta: number, // float
+		world_size_x: number, // float
+		world_size_y: number, // float
 	): void
 }
 

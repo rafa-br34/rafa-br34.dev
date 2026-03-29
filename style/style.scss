@@ -1,0 +1,96 @@
+.cs-banner-fade {
+	background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, #222222 100%);
+	bottom: 0;
+	height: 200px;
+	left: 0;
+	position: absolute;
+	right: 0;
+}
+
+.cs-banner {
+	display: block;
+	height: 400px;
+	image-rendering: pixelated;
+	object-fit: cover;
+	object-position: top;
+	width: 100%;
+}
+
+.cs-grid-tiny {
+	padding-left: 5px !important;
+}
+
+.cs-logo-small {
+	height: 16px;
+	width: 16px;
+}
+
+.cs-logo-big {
+	height: 32px;
+	width: 32px;
+}
+
+.cs-navbar {
+	font-weight: 400 !important;
+}
+
+.cs-navbar-active {
+	@extend .cs-navbar;
+	color: #EEEEEE !important;
+}
+
+.cs-transparent {
+	background: #00000000;
+}
+
+.cs-overlay {
+	inset: 0;
+	position: fixed;
+}
+.cs-overlay-background {
+	@extend .cs-overlay;
+	height: 100%;
+	width: 100%;
+}
+
+.cs-gallery-image {
+	&:hover {
+		cursor: pointer;
+	}
+
+	.cs-gallery-overlay {
+		@extend .cs-overlay;
+		background-color: rgba(0, 0, 0, 0.85);
+		display: none;
+		z-index: 1200;
+	}
+
+	.cs-gallery-overlay.visible {
+		display: block;
+	}
+	.cs-gallery-overlay-image {
+		display: block;
+		height: auto;
+		margin: 0 auto;
+		max-height: 80vh;
+		object-fit: contain;
+		width: auto;
+	}
+
+	.cs-gallery-mask {
+		background: rgba(0, 0, 0, 0.7);
+		transition: opacity 0.25s ease;
+		z-index: 2000;
+	}
+
+	.cs-gallery-mask.hidden {
+		opacity: 0;
+		pointer-events: none;
+	}
+}
+
+body {
+	background: #222222;
+	position: sticky;
+	z-index: -100;
+}
