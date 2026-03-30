@@ -261,7 +261,7 @@ EMSCRIPTEN_KEEPALIVE void compute_kernel_naive(
 ) {
 	const float force_range_sqr = force_range * force_range;
 
-	//#pragma clang loop unroll_count(8)
+#pragma clang loop unroll_count(8)
 	for (int a = 0; a < particle_count; a++) {
 		float
 			tx = 0.f,
@@ -273,7 +273,7 @@ EMSCRIPTEN_KEEPALIVE void compute_kernel_naive(
 
 		const int type_a = particle_types[a] * matrix_size;
 
-		//#pragma clang loop unroll_count(16)
+#pragma clang loop unroll_count(16)
 		for (int b = 0; b < particle_count; b++) {
 			if (a == b)
 				continue;
@@ -301,8 +301,7 @@ EMSCRIPTEN_KEEPALIVE void compute_kernel_naive(
 		particle_vel_y[a] *= force_dampening;
 	}
 
-	//#pragma clang loop vectorize(enable) interleave(enable)
-	//#pragma clang loop unroll_count(24)
+#pragma clang loop unroll_count(24)
 	for (int i = 0; i < particle_count; i++) {
 
 		float x = particle_pos_x[i] + particle_vel_x[i] * time_delta;
