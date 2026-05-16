@@ -78,3 +78,26 @@ artists:
         dates:
           request: "2025-05-19"
           creation: "2025-09-14"
+
+  - name: "zyria"
+    socials:
+      - link: https://www.furaffinity.net/user/zyriathedragon/
+        type: furaffinity
+      - link: https://twitter.com/zyriaarts
+        type: twitter
+      - link: https://bsky.app/profile/zyriaarts.bsky.social
+        type: bluesky
+      - link: https://patreon.com/zyria666
+        type: patreon
+    artworks:
+      - file: zyria_ych_antisocial.png
+        type: ych
+        shape:
+          x: 1000
+          y: 869
+        mirrors:
+          - https://e621.net/posts/6368259
+          - https://www.furaffinity.net/view/64840965
+        dates:
+          request: "2026-03-08"
+          creation: "2026-04-29"

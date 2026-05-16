@@ -3,23 +3,23 @@
 precision highp float;
 
 // To framebuffer
-out vec4 o_FragColor;
+out vec4 oFragColor;
 
 // From vertex shader
-in vec2 s_Position;
-flat in uint s_Properties;
+in vec2 sPosition;
+flat in uint sProperties;
 
 void main() {
-	float Alpha = 1.0 - smoothstep(1.0 - 3.0 * 0.25, 1.0, length(s_Position));
+	float Alpha = 1.0 - smoothstep(1.0 - 3.0 * 0.25, 1.0, length(sPosition));
 
 	const vec3 Colors[] = vec3[](
-		vec3(1, 0, 0),
-		vec3(0, 1, 0),
-		vec3(0, 0, 1),
-		vec3(1, 0, 1),
-		vec3(1, 1, 0),
-		vec3(0, 1, 1)
+		vec3(0.8, 0.1, 0.1),
+		vec3(0.1, 0.8, 0.1),
+		vec3(0.1, 0.1, 0.8),
+		vec3(0.8, 0.1, 0.8),
+		vec3(0.8, 0.8, 0.1),
+		vec3(0.1, 0.8, 0.8)
 	);
 
-	o_FragColor = vec4(Colors[s_Properties] / 1.5, Alpha);
+	oFragColor = vec4(Colors[sProperties] / 1.5, Alpha);
 }
