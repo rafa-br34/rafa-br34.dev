@@ -1,0 +1,28 @@
+import type { Artist, Artwork } from "../../../catalog"
+import { getAlternative, getResource } from "../../../catalog"
+
+export function GalleryCard(
+	{
+		artist,
+		artwork,
+		onClick,
+	}: {
+		readonly artist: Artist
+		readonly artwork: Artwork
+		readonly onClick: (artist: Artist, artwork: Artwork) => void
+	},
+) {
+	return (
+		<div
+			className="overflow-hidden rounded-md cursor-pointer transition-transform hover:scale-105 break-inside-avoid mb-4"
+			onClick={() => onClick(artist, artwork)}
+		>
+			<img
+				src={getResource(artwork)}
+				alt={getAlternative(artist, artwork)}
+				loading="lazy"
+				className="w-full h-full object-cover"
+			/>
+		</div>
+	)
+}
