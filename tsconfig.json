@@ -2,15 +2,15 @@
 	"compilerOptions": {
 		"allowJs": true,
 		"experimentalDecorators": true,
-		"module": "nodenext",
+		"module": "esnext",
 		"lib": ["es2023", "dom"],
 		"target": "es2023",
-		"moduleResolution": "nodenext",
+		"moduleResolution": "bundler",
 		"outDir": "build",
 		"strict": true,
 		"noImplicitAny": true,
 		"removeComments": true,
-		"noImplicitReturns": true,
+		"noImplicitReturns": false,
 		"resolveJsonModule": true,
 		"allowSyntheticDefaultImports": true,
 		"allowUnreachableCode": true,
@@ -19,6 +19,7 @@
 		"sourceMap": true,
 		"skipLibCheck": true,
 		"forceConsistentCasingInFileNames": true,
+		"jsx": "react-jsx",
 		"paths": {
 			"@/*": ["./src/*"]
 		}

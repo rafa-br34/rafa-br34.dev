@@ -28,12 +28,12 @@ interface Catalog {
 	artists: Artist[]
 }
 
-function GetResource(Item_Artwork: Artwork) {
-	return `/assets/artwork/${Item_Artwork.file}`
+function getResource(itemArtwork: Artwork) {
+	return `/assets/artwork/${itemArtwork.file}`
 }
 
-function GetAlternative(Item_Artist: Artist, Item_Artwork: Artwork) {
-	return `${Item_Artwork.type} from ${Item_Artist.name} titled ${Item_Artwork.file}`
+function getAlternative(itemArtist: Artist, itemArtwork: Artwork) {
+	return `${itemArtwork.type} from ${itemArtist.name} titled ${itemArtwork.file}`
 }
 
-export { Artist, Artwork, Catalog, GetAlternative, GetResource, SocialMedia }
+export { Artist, Artwork, Catalog, getAlternative, getResource, SocialMedia }

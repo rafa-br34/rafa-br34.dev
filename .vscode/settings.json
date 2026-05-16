@@ -56,7 +56,20 @@
 		"editor.formatOnSave": true,
 		"editor.formatOnSaveMode": "file"
 	},
+	"[html]": {
+		"editor.defaultFormatter": "dprint.dprint",
+		"editor.formatOnSave": true,
+		"editor.formatOnSaveMode": "file"
+	},
 	"cmake.useCMakePresets": "always",
 	"cmake.sourceDirectory": "${workspaceFolder}/src/wasm",
-	"C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools"
+	"C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+	"python-envs.pythonProjects": [
+		{
+			"path": ".",
+			"envManager": "ms-python.python:system",
+			"packageManager": "ms-python.python:pip"
+		}
+	],
+	"sonarlint.pathToCompileCommands": "${workspaceFolder}\\src\\wasm\\build\\compile_commands.json"
 }

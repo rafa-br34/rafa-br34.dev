@@ -3,53 +3,24 @@ import CopyWebpackPlugin from "copy-webpack-plugin"
 import ESLintWebpackPlugin from "eslint-webpack-plugin"
 import HtmlWebpackPlugin from "html-webpack-plugin"
 import MiniCssExtractPlugin from "mini-css-extract-plugin"
-import webpack from "webpack"
 
 import path from "path"
 import { argv } from "process"
 import { fileURLToPath } from "url"
 
-import { htmlWebpackPluginTemplateCustomizer } from "template-ejs-loader"
-
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
 const Entries = {
-	index: "./src/index.ts",
-	gallery: "./src/gallery.ts",
-	projects: "./src/projects.ts",
-	background: "./src/background.ts",
+	main: "./src/main.tsx",
 }
-const Pages = [
-	{
-		Source: "index.ejs",
-		Result: "index.html",
-		Chunks: ["index", "background"],
-	},
-	{
-		Source: "gallery.ejs",
-		Result: "gallery.html",
-		Chunks: ["gallery", "background"],
-	},
-	{
-		Source: "projects.ejs",
-		Result: "projects.html",
-		Chunks: ["projects", "background"],
-	},
-	{
-		Source: "background.ejs",
-		Result: "background.html",
-		Chunks: ["background"],
-	},
-]
 
-for (let Page of Pages) {
-	for (let Chunk of Page.Chunks) {
-		if (!Entries[Chunk]) {
-			throw new Error(`Could not find source file for chunk "${Chunk}" in page "${Page.Source}"`)
-		}
-	}
-}
+const Pages = [
+	{ Result: "index.html" },
+	{ Result: "gallery.html" },
+	{ Result: "projects.html" },
+	{ Result: "background.html" },
+]
 
 export default {
 	entry: Entries,
@@ -63,28 +34,24 @@ export default {
 
 	resolve: {
 		extensions: [".tsx", ".ts", ".js"],
+		alias: {
+			"@": path.resolve(__dirname, "src"),
+		},
 	},
 
 	module: {
 		rules: [
 			{
-				test: /\.ts$/,
+				test: /\.tsx?$/,
 				use: "ts-loader",
 				exclude: /node_modules/,
 			},
 			{
-				test: /\.(scss|sass|css)$/,
+				test: /\.css$/,
 				use: [
 					MiniCssExtractPlugin.loader,
 					"css-loader",
-					"sass-loader",
-				],
-			},
-			{
-				test: /\.ejs$/i,
-				use: [
-					"html-loader",
-					"template-ejs-loader",
+					"postcss-loader",
 				],
 			},
 		],
@@ -92,29 +59,13 @@ export default {
 	plugins: [
 		new CleanWebpackPlugin(),
 
-		new webpack.ProvidePlugin({
-			$: "jquery",
-			jQuery: "jquery",
-		}),
-
-		...Pages.map((Value) => {
+		...Pages.map(({ Result }) => {
 			return new HtmlWebpackPlugin({
 				inject: "head",
 				scriptLoading: "defer",
-				filename: Value.Result,
-				chunks: Value.Chunks,
-				template: htmlWebpackPluginTemplateCustomizer({
-					templatePath: `./static/${Value.Source}`,
-
-					htmlLoaderOption: {
-						sources: false,
-					},
-
-					templateEjsLoaderOption: {
-						root: "",
-						data: {},
-					},
-				}),
+				filename: Result,
+				chunks: ["main"],
+				template: "./static/index.html",
 			})
 		}),
 
@@ -132,7 +83,7 @@ export default {
 		}),
 
 		new ESLintWebpackPlugin({
-			extensions: ["ts"],
+			extensions: ["ts", "tsx"],
 			failOnError: false,
 			overrideConfigFile: path.resolve(__dirname, ".eslintrc.cjs"),
 		}),
@@ -143,6 +94,14 @@ export default {
 		port: 3000,
 		hot: true,
 		open: true,
+		historyApiFallback: {
+			rewrites: [
+				{ from: /^\/gallery$/, to: "/gallery.html" },
+				{ from: /^\/projects$/, to: "/projects.html" },
+				{ from: /^\/background$/, to: "/background.html" },
+				{ from: /./, to: "/index.html" },
+			],
+		},
 	},
 
 	experiments: {
