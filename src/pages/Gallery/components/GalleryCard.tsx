@@ -20,7 +20,9 @@ export function GalleryCard(
 			<img
 				src={getResource(artwork)}
 				alt={getAlternative(artist, artwork)}
-				loading="lazy"
+				width={artwork.shape.x}
+				height={artwork.shape.y}
+				decoding="async"
 				className="w-full h-full object-cover"
 			/>
 		</div>

@@ -5,7 +5,7 @@ interface SocialMedia {
 
 interface Artwork {
 	file: string
-	type: ["gift", "commission", "request"]
+	type: "gift" | "commission" | "request"
 	mirrors: string[]
 	shape: {
 		x: number
