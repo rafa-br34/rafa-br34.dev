@@ -83,8 +83,6 @@ artists:
     socials:
       - link: https://www.furaffinity.net/user/zyriathedragon/
         type: furaffinity
-      - link: https://twitter.com/zyriaarts
-        type: twitter
       - link: https://bsky.app/profile/zyriaarts.bsky.social
         type: bluesky
       - link: https://patreon.com/zyria666
