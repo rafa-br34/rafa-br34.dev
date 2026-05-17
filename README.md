@@ -1,6 +1,6 @@
 # Personal website
 
-Here you can find the source code for my own personal website, built with Webpack, UIkit, SASS, Emscripten, TypeScript, and EJS.
+Here you can find the source code for my own personal website, built with [React](https://react.dev/), [Tailwind](https://tailwindcss.com/), [Webpack](https://webpack.js.org/), [TypeScript](https://www.typescriptlang.org/), and [Emscripten](https://emscripten.org/).
 
 ## Table of contents
 
