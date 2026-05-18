@@ -81,19 +81,17 @@ export function Home() {
 							<p>
 								It seems you have found my personal web page! Here you can find some of my projects and perhaps learn a bit about me.
 							</p>
-							<p>Online I&apos;m known as rafa_br34, rafa-br34, or rarely rafabr34.</p>
+							<p>Online, I'm known as rafa_br34, rafa-br34, or rarely rafabr34.</p>
 							<p>
-								I am a {yearsSinceBirth.toFixed(7)}{" "}
-								year old Brazilian programmer who codes C/C++, Python, TypeScript, and a bit of Verilog/SystemVerilog. I also have a interest in cyber security,
-								computer science, and physics.
+								I am an {yearsSinceBirth.toFixed(7)}{" "}
+								year-old Brazilian programmer who loves mythological/fictional beasts and likes anything even remotely related to computers.
+								<br />
+								I code C/C++, Python, TypeScript, and a bit of Verilog/SystemVerilog. I also have an interest in cybersecurity, computer science, and physics.
 							</p>
-							<p>I might also be a fluffy feral dragon.</p>
+							<p>My sona is a black feral furred dragon with very specific markings on their snout</p>
 							<p>
-								Feel free to reach out through Discord (rafa_br34) (nearly instant response if I&apos;m available). Alternatively email{" "}
-								<a href="mailto:rafa_br34@exulan.com.au" className="underline">
-									rafa_br34@exulan.com.au
-								</a>{" "}
-								(will likely take much longer to answer).
+								Feel free to reach out through Discord (rafa_br34) (nearly instant response if I'm available). Alternatively email{" "}
+								<a href="mailto:rafa_br34@exulan.com.au" className="underline">rafa_br34@exulan.com.au</a> (will likely take much longer to answer).
 							</p>
 
 							<h2 className="text-left text-xl">Socials</h2>

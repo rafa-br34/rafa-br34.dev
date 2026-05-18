@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react"
 import { type ComputeKernelInterface, ComputeKernelLoader } from "../background_compute"
 import { cn } from "../lib/utils"
 
+// @todo This entire file is a mess, revisit later.
 let navigating = false
 let navigatingTimeout = 0
 
@@ -17,7 +18,7 @@ function setNavigating() {
 }
 
 // We monkey patch this because that on chromium browsers the background animation sucks up too much time
-// Thus the routes don't change until the user interacts
+// Thus React doesn't re-flow until the user interacts (scrolls up/down)
 {
 	const { pushState, replaceState } = globalThis.history
 
@@ -268,7 +269,9 @@ export function ParticleBackground(
 					return
 				}
 
-				if (navigating && frameSkip++ % 4 === 0) { // 1/4 frames
+				// @todo Find a better way than this
+				// Skip 1/4 frames when navigating (Check the monkey patch at the start of the file)
+				if (navigating && frameSkip++ % 4 === 0) {
 					animationId = requestAnimationFrame(updateFrame)
 					return
 				}
