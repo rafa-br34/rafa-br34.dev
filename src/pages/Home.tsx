@@ -91,7 +91,7 @@ export function Home() {
 							<p>My sona is a black feral furred dragon with very specific markings on their snout</p>
 							<p>
 								Feel free to reach out through Discord (rafa_br34) (nearly instant response if I'm available). Alternatively email{" "}
-								<a href="mailto:rafa_br34@exulan.com.au" className="underline">rafa_br34@exulan.com.au</a> (will likely take much longer to answer).
+								<a href="mailto:rafa_br34@exulan.com" className="underline">rafa_br34@exulan.com</a> (will likely take much longer to answer).
 							</p>
 
 							<h2 className="text-left text-xl">Socials</h2>
