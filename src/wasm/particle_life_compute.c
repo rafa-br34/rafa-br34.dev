@@ -259,11 +259,6 @@ EMSCRIPTEN_KEEPALIVE void compute_kernel_naive(
 ) {
 	const float force_range_sqr = force_range * force_range;
 
-	// Force function constants
-	const float inv_force_range = 1.0f / force_range;
-	const float inv_beta = 1.0f / force_beta;
-	const float inv_one_minus_beta = 1.0f / (1.0f - force_beta);
-
 #pragma clang loop unroll_count(8)
 	for (int a = 0; a < particle_count; a++) {
 		float
