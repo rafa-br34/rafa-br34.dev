@@ -1,6 +1,7 @@
 import { useState } from "react"
-import type { Artist, Artwork } from "../../catalog"
+
 import { SEO } from "../../components/SEO"
+import type { Artist, Artwork } from "../../lib/catalog"
 import { GalleryGrid } from "./components/GalleryGrid"
 import { GalleryLoadingMask } from "./components/GalleryLoadingMask"
 import { GalleryOverlay } from "./components/GalleryOverlay"

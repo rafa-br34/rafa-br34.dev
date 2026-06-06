@@ -1,5 +1,5 @@
-import type { Artist, Artwork } from "../../../catalog"
-import { getAlternative, getResource } from "../../../catalog"
+import type { Artist, Artwork } from "@/lib/catalog"
+import { getAlternative, getResource } from "@/lib/catalog"
 
 export function GalleryCard(
 	{

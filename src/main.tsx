@@ -6,12 +6,16 @@ import { HelmetProvider } from "react-helmet-async"
 import { BrowserRouter } from "react-router-dom"
 import { App } from "./app"
 
+import { TooltipProvider } from "@/components/ui/tooltip"
+
 const root = createRoot(document.getElementById("root"))
 root.render(
 	<StrictMode>
 		<HelmetProvider>
 			<BrowserRouter>
-				<App />
+				<TooltipProvider>
+					<App />
+				</TooltipProvider>
 			</BrowserRouter>
 		</HelmetProvider>
 	</StrictMode>,

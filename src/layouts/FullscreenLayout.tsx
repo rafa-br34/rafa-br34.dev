@@ -1,5 +1,6 @@
 import { Outlet } from "react-router-dom"
-import { ParticleBackground } from "../components/ParticleBackground"
+
+import { ParticleBackground } from "@/components/backgrounds/ParticleBackground"
 
 export function FullscreenLayout() {
 	return (

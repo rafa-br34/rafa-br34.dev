@@ -1,6 +1,6 @@
-import compute_kernel_loader from "./wasm/background_compute"
+import compute_kernel_loader from "@/wasm/particle_life_compute"
 
-export interface ComputeKernelInterface {
+export interface ParticleLifeInterface {
 	HEAPU8: Uint8Array
 	HEAPF32: Float32Array
 	HEAP32: Int32Array
@@ -43,4 +43,4 @@ export interface ComputeKernelInterface {
 	): void
 }
 
-export const ComputeKernelLoader = compute_kernel_loader as unknown as (moduleArg?: any) => Promise<ComputeKernelInterface>
+export const ParticleLifeLoader = compute_kernel_loader as unknown as (moduleArg?: any) => Promise<ParticleLifeInterface>

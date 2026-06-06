@@ -1,4 +1,4 @@
-import type { Artist, Artwork, Catalog } from "../../../catalog"
+import type { Artist, Artwork, Catalog } from "@/lib/catalog"
 import { GalleryCard } from "./GalleryCard"
 
 export function GalleryGrid(

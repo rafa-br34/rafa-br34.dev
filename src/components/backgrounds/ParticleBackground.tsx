@@ -1,6 +1,8 @@
 import { useEffect, useRef } from "react"
-import { type ComputeKernelInterface, ComputeKernelLoader } from "../background_compute"
-import { cn } from "../lib/utils"
+
+import { cn } from "@/lib/utils"
+
+import { type ParticleLifeInterface, ParticleLifeLoader } from "@/lib/kernels/particle_life_compute"
 
 // @todo This entire file is a mess, revisit later.
 let navigating = false
@@ -9,7 +11,7 @@ let navigatingTimeout = 0
 function setNavigating() {
 	navigating = true
 	clearTimeout(navigatingTimeout)
-	navigatingTimeout = globalThis.setTimeout(
+	navigatingTimeout = setTimeout(
 		() => {
 			navigating = false
 		},
@@ -62,7 +64,7 @@ export function ParticleBackground(
 	const stateRef = useRef<
 		{
 			animationId: number
-			computeKernel: ComputeKernelInterface
+			computeKernel: ParticleLifeInterface
 			allocs: number[]
 		} | null
 	>(null)
@@ -90,7 +92,7 @@ export function ParticleBackground(
 		canvas.addEventListener("webglcontextrestored", onContextRestored)
 
 		async function init() {
-			const computeKernel = await ComputeKernelLoader()
+			const computeKernel = await ParticleLifeLoader()
 
 			const gl = canvas.getContext("webgl2", { premultipliedAlpha: true, alpha: true })
 

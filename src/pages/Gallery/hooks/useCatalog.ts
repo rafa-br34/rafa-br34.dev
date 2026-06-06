@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import yaml from "yaml"
-import type { Catalog } from "../../../catalog"
+
+import type { Catalog } from "@/lib/catalog"
 
 export function useCatalog(): {
 	catalog: Catalog | null

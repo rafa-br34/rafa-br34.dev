@@ -1,8 +1,9 @@
 import { Loader2, X } from "lucide-react"
 import { useState } from "react"
-import type { Artist, Artwork } from "../../../catalog"
-import { getAlternative, getResource } from "../../../catalog"
-import Logos from "../../../social_media.json"
+
+import type { Artist, Artwork } from "@/lib/catalog"
+import { getAlternative, getResource } from "@/lib/catalog"
+import Logos from "@/social_media.json"
 
 function trimLink(url: string) {
 	return url

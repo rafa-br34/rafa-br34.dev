@@ -39,8 +39,8 @@
 	--ui-disabled-overlay: rgb(255 255 255 / 0.40);
 	/* shadcn/ui mappings */
 	--radius: 0.35rem;
-	--background: var(--color-theme-bg-0);
-	--foreground: var(--color-theme-fg-0);
+	--background: var(--color-theme-fg-0);
+	--foreground: var(--color-theme-bg-2);
 	--card: var(--color-theme-bg-1);
 	--card-foreground: var(--color-theme-fg-0);
 	--popover: var(--color-theme-bg-1);

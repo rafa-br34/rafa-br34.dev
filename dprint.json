@@ -45,6 +45,7 @@
 		"next-env.d.ts",
 		"src/wasm/build",
 		"src/wasm/*.js",
+		"src/components/ui/*",
 		"!src/components/ui/_icons.tsx"
 	],
 	"plugins": [

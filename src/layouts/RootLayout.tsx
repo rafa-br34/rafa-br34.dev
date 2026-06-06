@@ -1,8 +1,9 @@
 import { useEffect, useRef } from "react"
 import { Outlet, useLocation } from "react-router-dom"
-import { Footer } from "../components/Footer"
-import { Navbar } from "../components/Navbar"
-import { ParticleBackground } from "../components/ParticleBackground"
+
+import { Footer } from "@/components/Footer"
+import { Navbar } from "@/components/Navbar"
+import { ParticleBackground } from "@/components/backgrounds/ParticleBackground"
 
 export function RootLayout(
 	{
@@ -21,7 +22,7 @@ export function RootLayout(
 	}, [])
 
 	useEffect(() => {
-		scrollRef.current?.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior })
+		scrollRef.current?.scrollTo({ top: 0, behavior: "instant" })
 	}, [pathname])
 
 	return (

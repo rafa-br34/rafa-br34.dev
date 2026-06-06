@@ -1,5 +1,8 @@
+import Decimal from "decimal.js"
 import { useEffect, useState } from "react"
-import { SEO } from "../components/SEO"
+
+import { SEO } from "@/components/SEO"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 
 const socialsList = [
 	{
@@ -35,19 +38,19 @@ const socialsList = [
 ]
 
 export function Home() {
-	const MS_PER_GREGORIAN_YEAR = 365.2425 * 24 * 60 * 60 * 1000
-	const MS_PER_HOUR = 60 * 60 * 1000
+	const MS_PER_GREGORIAN_YEAR = Decimal(365.2425).mul(24 * 60 * 60 * 1000)
+	const MS_PER_HOUR = new Decimal(60 * 60 * 1000)
 
 	// 2008-03-13 11:06 UTC-03
-	const birthday = Date.UTC(2008, 2, 13, 11, 6) + MS_PER_HOUR * 3
+	const birthday = new Decimal(Date.UTC(2008, 2, 13, 11, 6)).plus(MS_PER_HOUR.mul(3))
 
 	function calculateAge() {
-		const currentTime = Date.now()
-		const timeSinceBirthday = currentTime - birthday
-		return timeSinceBirthday / MS_PER_GREGORIAN_YEAR
+		const currentTime = new Decimal(Date.now())
+		const timeSinceBirthday = currentTime.sub(birthday)
+		return timeSinceBirthday.div(MS_PER_GREGORIAN_YEAR)
 	}
 
-	const [yearsSinceBirth, setYearsSinceBirth] = useState<number>(calculateAge())
+	const [yearsSinceBirth, setYearsSinceBirth] = useState<Decimal>(calculateAge())
 
 	function updateAge() {
 		setYearsSinceBirth(calculateAge())
@@ -76,14 +79,19 @@ export function Home() {
 				<div className="container mx-auto m-4 px-4 text-shadow-lg/30">
 					<h1 className="text-left text-4xl mb-4">Hello stranger!</h1>
 
-					<div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
+					<div className="grid grid-cols-1 md:grid-cols-3 gap-8">
 						<div className="sm:col-span-2 space-y-4">
 							<p>
 								It seems you have found my personal web page! Here you can find some of my projects and perhaps learn a bit about me.
 							</p>
 							<p>Online, I'm known as rafa_br34, rafa-br34, or rarely rafabr34.</p>
 							<p>
-								I am an {yearsSinceBirth.toFixed(7)}{" "}
+								<Tooltip>
+									I am an <TooltipTrigger render={<u className="decoration-solid decoration-theme-fg-2">{yearsSinceBirth.toFixed(7)}</u>} />{" "}
+									<TooltipContent>
+										<p>This is a feature not a bug</p>
+									</TooltipContent>
+								</Tooltip>
 								year-old Brazilian programmer who loves mythological/fictional beasts and likes anything even remotely related to computers.
 								<br />
 								I code C/C++, Python, TypeScript, and a bit of Verilog/SystemVerilog. I also have an interest in cybersecurity, computer science, and physics.
@@ -104,11 +112,11 @@ export function Home() {
 							</div>
 						</div>
 
-						<div className="sm:col-span-1 flex items-center justify-center">
+						<div className="sm:col-span-1 flex items-center justify-center aspect-square">
 							<div className="text-center">
 								<img
 									src="/assets/artwork/gummi_arts_stare.png"
-									className="rounded-lg mx-auto w-96 h-96"
+									className="rounded-lg mx-auto w-96"
 									alt="My character drawn by Gummi_art"
 								/>
 								<p className="text-xs text-theme-fg-2 mt-2">

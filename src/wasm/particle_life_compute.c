@@ -81,7 +81,6 @@ EMSCRIPTEN_KEEPALIVE void compute_kernel_fast(
 	float cell_last_x = cell_length_x - 1.f;
 	float cell_last_y = cell_length_y - 1.f;
 
-
 	// First pass, count how many particles per cell
 	size_t* cell_occupancy = calloc(cell_count, sizeof(size_t));
 
@@ -115,7 +114,6 @@ EMSCRIPTEN_KEEPALIVE void compute_kernel_fast(
 		maximum_occupancy++;
 
 	size_t pitch_extra = maximum_occupancy + 1;
-
 
 	// Third pass, write cell indexes
 	size_t* flat_array = malloc(cell_count * pitch_extra * sizeof(size_t));
@@ -181,7 +179,7 @@ EMSCRIPTEN_KEEPALIVE void compute_kernel_fast(
 			float ay = particle_pos_y[index_a];
 
 			for (size_t n = 0; n < neighbor_count; n++) {
-#pragma clang loop unroll_count(8)
+#pragma clang loop unroll_count(16)
 				// Iterate array data (B)
 				for (size_t* pointer_b = &flat_array[neighbor_indexes[n] * pitch_extra]; *pointer_b != SENTINEL_VALUE; pointer_b++) {
 					size_t index_b = *pointer_b;
@@ -224,7 +222,7 @@ EMSCRIPTEN_KEEPALIVE void compute_kernel_fast(
 
 
 	// Sixth pass, write back
-#pragma clang loop unroll_count(32)
+#pragma clang loop unroll_count(128)
 	for (size_t i = 0; i < particle_count; i++) {
 		float x = particle_pos_x[i] + particle_vel_x[i] * time_delta;
 		float y = particle_pos_y[i] + particle_vel_y[i] * time_delta;
@@ -301,7 +299,7 @@ EMSCRIPTEN_KEEPALIVE void compute_kernel_naive(
 		particle_vel_y[a] *= force_dampening;
 	}
 
-#pragma clang loop unroll_count(24)
+#pragma clang loop unroll_count(128)
 	for (int i = 0; i < particle_count; i++) {
 
 		float x = particle_pos_x[i] + particle_vel_x[i] * time_delta;
