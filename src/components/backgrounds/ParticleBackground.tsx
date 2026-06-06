@@ -146,7 +146,7 @@ export function ParticleBackground(
 
 			const scaleMultiplier = 1024 * 40
 			const particleMatrixSize = 6
-			const particleCount = 1024 * 10
+			const particleCount = 1024 * 24
 			const particleSize = 128
 
 			const sizeParticleMatrix = particleMatrixSize * particleMatrixSize

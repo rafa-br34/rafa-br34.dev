@@ -1458,11 +1458,11 @@ function checkIncomingModuleAPI() {
 
 // Imports from the Wasm binary.
 var _compute_kernel_fast = Module['_compute_kernel_fast'] = makeInvalidEarlyAccess('_compute_kernel_fast');
-var _malloc = Module['_malloc'] = makeInvalidEarlyAccess('_malloc');
-var _free = Module['_free'] = makeInvalidEarlyAccess('_free');
 var _compute_kernel_naive = Module['_compute_kernel_naive'] = makeInvalidEarlyAccess('_compute_kernel_naive');
 var _fflush = makeInvalidEarlyAccess('_fflush');
 var _strerror = makeInvalidEarlyAccess('_strerror');
+var _malloc = Module['_malloc'] = makeInvalidEarlyAccess('_malloc');
+var _free = Module['_free'] = makeInvalidEarlyAccess('_free');
 var _emscripten_stack_get_end = makeInvalidEarlyAccess('_emscripten_stack_get_end');
 var _emscripten_stack_get_base = makeInvalidEarlyAccess('_emscripten_stack_get_base');
 var _emscripten_stack_init = makeInvalidEarlyAccess('_emscripten_stack_init');
@@ -1473,11 +1473,11 @@ var _emscripten_stack_get_current = makeInvalidEarlyAccess('_emscripten_stack_ge
 
 function assignWasmExports(wasmExports) {
   Module['_compute_kernel_fast'] = _compute_kernel_fast = createExportWrapper('compute_kernel_fast', 15);
-  Module['_malloc'] = _malloc = createExportWrapper('malloc', 1);
-  Module['_free'] = _free = createExportWrapper('free', 1);
   Module['_compute_kernel_naive'] = _compute_kernel_naive = createExportWrapper('compute_kernel_naive', 15);
   _fflush = createExportWrapper('fflush', 1);
   _strerror = createExportWrapper('strerror', 1);
+  Module['_malloc'] = _malloc = createExportWrapper('malloc', 1);
+  Module['_free'] = _free = createExportWrapper('free', 1);
   _emscripten_stack_get_end = wasmExports['emscripten_stack_get_end'];
   _emscripten_stack_get_base = wasmExports['emscripten_stack_get_base'];
   _emscripten_stack_init = wasmExports['emscripten_stack_init'];

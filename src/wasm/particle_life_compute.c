@@ -2,9 +2,9 @@
 #include <float.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <memory.h>
+#include <assert.h>
 #include <emscripten/emscripten.h>
-
-#include "kvec.h"
 
 
 #ifndef max
@@ -52,7 +52,6 @@ static inline int wrap_integer(int value, int last) {
 	return value;
 }
 
-
 EMSCRIPTEN_KEEPALIVE void compute_kernel_fast(
 	const float* __restrict matrix_values,
 	size_t matrix_size,
@@ -82,7 +81,9 @@ EMSCRIPTEN_KEEPALIVE void compute_kernel_fast(
 	float cell_last_y = cell_length_y - 1.f;
 
 	// First pass, count how many particles per cell
-	size_t* cell_occupancy = calloc(cell_count, sizeof(size_t));
+	static size_t* cell_occupancy = NULL;
+	cell_occupancy = realloc(cell_occupancy, cell_count * sizeof(size_t));
+	memset(cell_occupancy, 0, cell_count * sizeof(size_t));
 
 #pragma clang loop unroll_count(16)
 	for (size_t i = 0; i < particle_count; i++) {
@@ -92,10 +93,10 @@ EMSCRIPTEN_KEEPALIVE void compute_kernel_fast(
 		cell_occupancy[cy * cell_length_x + cx]++;
 	}
 
-
 	// Second pass, get the largest cell
-	kvec_t(size_t) used_cells;
-	kv_init(used_cells);
+	static size_t* used_cells_list = NULL;
+	used_cells_list = realloc(used_cells_list, cell_count * sizeof(size_t));
+	size_t used_cells_count = 0;
 
 	size_t maximum_occupancy = 0;
 
@@ -104,7 +105,7 @@ EMSCRIPTEN_KEEPALIVE void compute_kernel_fast(
 		size_t cell_particles = cell_occupancy[i];
 
 		if (cell_particles)
-			kv_push(size_t, used_cells, i);
+			used_cells_list[used_cells_count++] = i;
 
 		if (cell_particles > maximum_occupancy)
 			maximum_occupancy = cell_particles;
@@ -116,8 +117,15 @@ EMSCRIPTEN_KEEPALIVE void compute_kernel_fast(
 	size_t pitch_extra = maximum_occupancy + 1;
 
 	// Third pass, write cell indexes
-	size_t* flat_array = malloc(cell_count * pitch_extra * sizeof(size_t));
-	size_t* write_position = calloc(cell_count, sizeof(size_t));
+	static size_t* write_position = NULL;
+	write_position = realloc(write_position, cell_count * sizeof(size_t));
+	memset(write_position, 0, cell_count * sizeof(size_t));
+
+	static size_t* flat_array = NULL;
+	flat_array = realloc(flat_array, cell_count * pitch_extra * sizeof(size_t));
+	memset(flat_array, 0xFF, cell_count * pitch_extra * sizeof(size_t));
+
+	static_assert(0xFFFFFFFF == (uint32_t)SENTINEL_VALUE, "Sentinel must be all 0xFF");
 
 #pragma clang loop unroll_count(16)
 	for (size_t i = 0; i < particle_count; i++) {
@@ -132,19 +140,11 @@ EMSCRIPTEN_KEEPALIVE void compute_kernel_fast(
 	}
 
 
-	// Fourth pass, write sentinels
-#pragma clang loop unroll_count(16)
-	for (size_t i = 0; i < cell_count; i++) {
-		size_t value = write_position[i];
-		flat_array[i * pitch_extra + value] = SENTINEL_VALUE;
-	}
-
-
-	// Fifth pass, compute physical interactions between particles
+	// Fourth pass, compute physical interactions between particles
 	const float force_range_sqr = force_range * force_range;
 
-	for (size_t i = 0; i < kv_size(used_cells); i++) {
-		size_t ci = kv_A(used_cells, i);
+	for (size_t i = 0; i < used_cells_count; i++) {
+		size_t ci = used_cells_list[i];
 
 		int cx = (int)(ci % cell_length_x);
 		int cy = (int)(ci / cell_length_x);
@@ -221,7 +221,7 @@ EMSCRIPTEN_KEEPALIVE void compute_kernel_fast(
 	}
 
 
-	// Sixth pass, write back
+	// Fifth pass, write back
 #pragma clang loop unroll_count(128)
 	for (size_t i = 0; i < particle_count; i++) {
 		float x = particle_pos_x[i] + particle_vel_x[i] * time_delta;
@@ -232,11 +232,6 @@ EMSCRIPTEN_KEEPALIVE void compute_kernel_fast(
 		particle_pos_x[i] = x;
 		particle_pos_y[i] = y;
 	}
-
-	free(write_position);
-	free(flat_array);
-	free(cell_occupancy);
-	kv_destroy(used_cells);
 }
 
 
