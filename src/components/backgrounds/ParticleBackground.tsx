@@ -146,18 +146,18 @@ export function ParticleBackground(
 
 			const scaleMultiplier = 1024 * 40
 			const particleMatrixSize = 6
-			const particleCount = 1024 * 24
+			const particleCount = 1024 * 12
 			const particleSize = 128
 
 			const sizeParticleMatrix = particleMatrixSize * particleMatrixSize
 			const sizeParticleTypes = particleCount
 
-			const allocParticlePosX = computeKernel._malloc(Float32Array.BYTES_PER_ELEMENT * particleCount)
-			const allocParticlePosY = computeKernel._malloc(Float32Array.BYTES_PER_ELEMENT * particleCount)
-			const allocParticleVelX = computeKernel._malloc(Float32Array.BYTES_PER_ELEMENT * particleCount)
-			const allocParticleVelY = computeKernel._malloc(Float32Array.BYTES_PER_ELEMENT * particleCount)
-			const allocParticleMatrix = computeKernel._malloc(Float32Array.BYTES_PER_ELEMENT * sizeParticleMatrix)
-			const allocParticleTypes = computeKernel._malloc(Uint8Array.BYTES_PER_ELEMENT * sizeParticleTypes)
+			const allocParticlePosX = computeKernel._aligned_alloc(16, Float32Array.BYTES_PER_ELEMENT * particleCount)
+			const allocParticlePosY = computeKernel._aligned_alloc(16, Float32Array.BYTES_PER_ELEMENT * particleCount)
+			const allocParticleVelX = computeKernel._aligned_alloc(16, Float32Array.BYTES_PER_ELEMENT * particleCount)
+			const allocParticleVelY = computeKernel._aligned_alloc(16, Float32Array.BYTES_PER_ELEMENT * particleCount)
+			const allocParticleMatrix = computeKernel._aligned_alloc(16, Float32Array.BYTES_PER_ELEMENT * sizeParticleMatrix)
+			const allocParticleTypes = computeKernel._aligned_alloc(16, Uint8Array.BYTES_PER_ELEMENT * sizeParticleTypes)
 
 			const allocs = [
 				allocParticlePosX,
@@ -266,6 +266,8 @@ export function ParticleBackground(
 			let frameSkip = 0
 			const speed = 1.75 / (1 / 75)
 
+			const average: number[] = []
+
 			function updateFrame(currFrame: number = 0) {
 				if (destroyed || contextLost) {
 					return
@@ -282,6 +284,7 @@ export function ParticleBackground(
 				const timeStep = Math.min(speed * delta, 2)
 				lastFrame = currFrame
 
+				const kernelStart = performance.now()
 				computeKernel._compute_kernel_fast(
 					allocParticleMatrix,
 					particleMatrixSize,
@@ -299,6 +302,13 @@ export function ParticleBackground(
 					scalingX + particleSize,
 					scalingY + particleSize,
 				)
+				const kernelTime = performance.now() - kernelStart
+				average.push(kernelTime)
+
+				if (average.length >= 30) {
+					console.log(average.reduce((a, b) => a + b) / average.length)
+					average.length = 0
+				}
 
 				context.clearColor(0, 0, 0, 0)
 				context.clear(context.COLOR_BUFFER_BIT)

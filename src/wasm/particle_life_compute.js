@@ -1459,6 +1459,7 @@ function checkIncomingModuleAPI() {
 // Imports from the Wasm binary.
 var _compute_kernel_fast = Module['_compute_kernel_fast'] = makeInvalidEarlyAccess('_compute_kernel_fast');
 var _compute_kernel_naive = Module['_compute_kernel_naive'] = makeInvalidEarlyAccess('_compute_kernel_naive');
+var _aligned_alloc = Module['_aligned_alloc'] = makeInvalidEarlyAccess('_aligned_alloc');
 var _fflush = makeInvalidEarlyAccess('_fflush');
 var _strerror = makeInvalidEarlyAccess('_strerror');
 var _malloc = Module['_malloc'] = makeInvalidEarlyAccess('_malloc');
@@ -1474,6 +1475,7 @@ var _emscripten_stack_get_current = makeInvalidEarlyAccess('_emscripten_stack_ge
 function assignWasmExports(wasmExports) {
   Module['_compute_kernel_fast'] = _compute_kernel_fast = createExportWrapper('compute_kernel_fast', 15);
   Module['_compute_kernel_naive'] = _compute_kernel_naive = createExportWrapper('compute_kernel_naive', 15);
+  Module['_aligned_alloc'] = _aligned_alloc = createExportWrapper('aligned_alloc', 2);
   _fflush = createExportWrapper('fflush', 1);
   _strerror = createExportWrapper('strerror', 1);
   Module['_malloc'] = _malloc = createExportWrapper('malloc', 1);

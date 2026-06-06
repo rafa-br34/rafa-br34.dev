@@ -5,6 +5,7 @@ export interface ParticleLifeInterface {
 	HEAPF32: Float32Array
 	HEAP32: Int32Array
 	HEAPU32: Uint32Array
+	_aligned_alloc(alignment: number, size: number): number
 	_malloc(size: number): number
 	_free(ptr: number): void
 	_compute_kernel_fast(

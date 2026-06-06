@@ -21,7 +21,7 @@ target_link_options(particle_life_compute PRIVATE
 	"-sWASM=1"
 	"-sMODULARIZE"
 	"-sEXPORT_NAME='particle_life_compute'"
-	"-sEXPORTED_FUNCTIONS=['_compute_kernel_fast','_compute_kernel_naive','_malloc','_free']"
+	"-sEXPORTED_FUNCTIONS=['_compute_kernel_fast','_compute_kernel_naive','_aligned_alloc','_malloc','_free']"
 	"-sEXPORTED_RUNTIME_METHODS=['HEAPU8','HEAPF32','HEAP32','HEAPU32']"
 	"-sALLOW_MEMORY_GROWTH=1"
 	"-sENVIRONMENT=web"
