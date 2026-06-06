@@ -21,20 +21,11 @@
 
 #define FORCE_FUNCTION force_fn_normal
 
-static inline float force_fn_normal(
-	float inv_force_range,
-	float inv_beta,
-	float inv_one_minus_beta,
-	float magnitude,
-	float attraction,
-	float force_beta
-) {
-	const float range = magnitude * inv_force_range;
-
-	if (range < force_beta)
-		return range * inv_beta - 1.0f;
+static inline float force_fn_normal(float magnitude, float attraction, float beta) {
+	if (magnitude < beta)
+		return magnitude / beta - 1.f;
 	else
-		return attraction * (1.0f - fabsf(2.0f * range - 1.0f - force_beta) * inv_one_minus_beta);
+		return attraction * (1.0f - fabsf(2.0f * magnitude - 1.0f - beta) / (1.0f - beta));
 }
 
 
@@ -158,11 +149,6 @@ EMSCRIPTEN_KEEPALIVE void compute_kernel_fast(
 	// Fourth pass, compute physical interactions between particles
 	const float force_range_sqr = force_range * force_range;
 
-	// Force function constants
-	const float inv_force_range = 1.0f / force_range;
-	const float inv_beta = 1.0f / force_beta;
-	const float inv_one_minus_beta = 1.0f / (1.0f - force_beta);
-
 	for (size_t i = 0; i < used_cells_count; i++) {
 		size_t ci = used_cells_list[i];
 
@@ -200,6 +186,7 @@ EMSCRIPTEN_KEEPALIVE void compute_kernel_fast(
 
 			for (size_t n = 0; n < neighbor_count; n++) {
 				// Iterate array data (B)
+#pragma clang loop unroll_count(16)
 				for (size_t* pointer_b = &flat_array[neighbor_indexes[n] * pitch_extra]; *pointer_b != SENTINEL_VALUE; pointer_b++) {
 					size_t index_b = *pointer_b;
 
@@ -226,18 +213,10 @@ EMSCRIPTEN_KEEPALIVE void compute_kernel_fast(
 					const float magnitude = sqrtf(range_sqr) + FLT_EPSILON;
 					const float attraction = matrix_values[type_a + particle_types[index_b]];
 
-					const float multiplier = FORCE_FUNCTION(
-						inv_force_range,
-						inv_beta,
-						inv_one_minus_beta,
-						magnitude,
-						attraction,
-						force_beta
-					);
-					const float multiplied_force = multiplier * force_multiplier;
+					const float multiplier = FORCE_FUNCTION(magnitude / force_range, attraction, force_beta) * force_multiplier;
 
-					tx += (dx / magnitude) * multiplied_force;
-					ty += (dy / magnitude) * multiplied_force;
+					tx += (dx / magnitude) * multiplier;
+					ty += (dy / magnitude) * multiplier;
 				}
 			}
 
@@ -313,18 +292,10 @@ EMSCRIPTEN_KEEPALIVE void compute_kernel_naive(
 
 			const float magnitude = sqrt(range_sqr) + FLT_EPSILON;
 			const float attraction = matrix_values[type_a + particle_types[b]];
-			const float multiplier = FORCE_FUNCTION(
-				inv_force_range,
-				inv_beta,
-				inv_one_minus_beta,
-				magnitude,
-				attraction,
-				force_beta
-			);
-			const float multiplied_force = multiplier * force_multiplier;
+			const float multiplier = FORCE_FUNCTION(magnitude / force_range, attraction, force_beta) * force_multiplier;
 
-			tx += (dx / magnitude) * multiplied_force;
-			ty += (dy / magnitude) * multiplied_force;
+			tx += (dx / magnitude) * multiplier;
+			ty += (dy / magnitude) * multiplier;
 		}
 
 		particle_vel_x[a] += tx * time_delta;

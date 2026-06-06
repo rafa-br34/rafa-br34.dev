@@ -12,6 +12,8 @@ target_compile_options(particle_life_compute PRIVATE
 	-fno-math-errno
 	-msimd128
 	-mllvm -vectorize-loops
+	-fvectorize
+	-fslp-vectorize
 	-Rpass=loop-vectorize
 	-Rpass-missed=loop-vectorize
 	-Rpass-analysis=loop-vectorize
