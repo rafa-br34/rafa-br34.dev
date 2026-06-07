@@ -53,6 +53,11 @@ static inline int wrap_integer(int value, int last) {
 	return value;
 }
 
+static size_t* cell_occupancy = NULL;
+static size_t* used_cells_list = NULL;
+static size_t* write_position = NULL;
+static size_t* flat_array = NULL;
+
 EMSCRIPTEN_KEEPALIVE void compute_kernel_fast(
 	const float* __restrict matrix_values,
 	size_t matrix_size,
@@ -87,7 +92,6 @@ EMSCRIPTEN_KEEPALIVE void compute_kernel_fast(
 	float cell_last_y = cell_length_y - 1.f;
 
 	// First pass, count how many particles per cell
-	static size_t* cell_occupancy = NULL;
 	cell_occupancy = realloc(cell_occupancy, cell_count * sizeof(size_t));
 	memset(cell_occupancy, 0, cell_count * sizeof(size_t));
 
@@ -100,7 +104,6 @@ EMSCRIPTEN_KEEPALIVE void compute_kernel_fast(
 	}
 
 	// Second pass, get the largest cell
-	static size_t* used_cells_list = NULL;
 	used_cells_list = realloc(used_cells_list, cell_count * sizeof(size_t));
 	size_t used_cells_count = 0;
 
@@ -123,11 +126,9 @@ EMSCRIPTEN_KEEPALIVE void compute_kernel_fast(
 	size_t pitch_extra = maximum_occupancy + 1;
 
 	// Third pass, write cell indexes
-	static size_t* write_position = NULL;
 	write_position = realloc(write_position, cell_count * sizeof(size_t));
 	memset(write_position, 0, cell_count * sizeof(size_t));
 
-	static size_t* flat_array = NULL;
 	flat_array = realloc(flat_array, cell_count * pitch_extra * sizeof(size_t));
 	memset(flat_array, 0xFF, cell_count * pitch_extra * sizeof(size_t));
 
@@ -239,6 +240,12 @@ EMSCRIPTEN_KEEPALIVE void compute_kernel_fast(
 	}
 }
 
+EMSCRIPTEN_KEEPALIVE void compute_kernel_fast_free() {
+	free(cell_occupancy);
+	free(used_cells_list);
+	free(write_position);
+	free(flat_array);
+}
 
 EMSCRIPTEN_KEEPALIVE void compute_kernel_naive(
 	const float* __restrict matrix_values,

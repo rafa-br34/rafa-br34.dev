@@ -53,6 +53,32 @@ function createShader(context: WebGL2RenderingContext, source: string, type: GLe
 	return shaderHandle
 }
 
+function matrixToString(matrixSizeX: number, matrixValues: Iterable<number>) {
+	let biggestValue = 0
+
+	const stringList = Array
+		.from(matrixValues)
+		.map(
+			value => {
+				const numStr = (value < 0 ? "" : " ") + value.toString()
+
+				if (numStr.length > biggestValue) {
+					biggestValue = numStr.length
+				}
+
+				return numStr
+			},
+		)
+
+	return stringList
+		.map((value, index) => {
+			const lastSize = index > 0 ? stringList.at(index - 1).length : 0
+
+			return (index % matrixSizeX === 0 ? "\n" : " ".repeat(biggestValue - lastSize + 1)) + value
+		})
+		.join(",")
+}
+
 export function ParticleBackground(
 	{
 		className,
@@ -93,12 +119,12 @@ export function ParticleBackground(
 
 		async function init() {
 			const computeKernel = await ParticleLifeLoader()
-
 			const gl = canvas.getContext("webgl2", { premultipliedAlpha: true, alpha: true })
 
 			if (!gl) {
 				throw new Error("Failed to get WebGL2 context")
 			}
+
 			const context = gl
 
 			const shaderResp = await Promise.all([
@@ -144,7 +170,8 @@ export function ParticleBackground(
 				-Math.sqrt(3), -1,
 			])
 
-			const scaleMultiplier = 1024 * 40
+			const scaleWorldSpace = 1024
+			const scaleMultiplier = scaleWorldSpace * 40
 			const particleMatrixSize = 6
 			const particleCount = 1024 * 10
 			const particleSize = 128
@@ -178,6 +205,8 @@ export function ParticleBackground(
 			for (let i = 0; i < particleMatrixSize * particleMatrixSize; i++) {
 				particleMatrix[i] = 2 * Math.random() - 1
 			}
+
+			console.log(matrixToString(particleMatrixSize, particleMatrix))
 
 			const spinDirection = Math.random() > 0.5 ? 1 : -1
 			const spinSpeed = 0.05
@@ -264,7 +293,7 @@ export function ParticleBackground(
 
 			let lastFrame = performance.now()
 			let frameSkip = 0
-			const speed = 1.75 / (1 / 75)
+			const speed = 1 / (1 / 75)
 
 			const average: number[] = []
 
@@ -294,8 +323,8 @@ export function ParticleBackground(
 					allocParticleVelX,
 					allocParticleVelY,
 					particleCount,
-					0.3,
-					2048,
+					0.5,
+					scaleWorldSpace * 2,
 					0.9,
 					2,
 					timeStep,
@@ -335,12 +364,15 @@ export function ParticleBackground(
 			cancelAnimationFrame(stateRef.current?.animationId ?? animationId)
 			canvas.removeEventListener("webglcontextlost", onContextLost)
 			canvas.removeEventListener("webglcontextrestored", onContextRestored)
+
 			const state = stateRef.current
 
 			if (state) {
 				for (const ptr of state.allocs) {
 					state.computeKernel._free(ptr)
 				}
+
+				state.computeKernel._compute_kernel_fast_free()
 			}
 		}
 	}, [])

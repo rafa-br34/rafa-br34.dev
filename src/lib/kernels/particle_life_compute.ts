@@ -25,6 +25,7 @@ export interface ParticleLifeInterface {
 		worldSizeX: number, // float
 		worldSizeY: number, // float
 	): void
+	_compute_kernel_fast_free(): void
 	_compute_kernel_naive(
 		matrixValues: number, // float*
 		matrixSize: number, // size_t
