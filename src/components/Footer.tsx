@@ -1,4 +1,4 @@
-const techStack = [
+const TECH_STACK = [
 	{ name: "React", link: "https://react.dev/" },
 	{ name: "Tailwind", link: "https://tailwindcss.com/" },
 	{ name: "Webpack", link: "https://webpack.js.org/" },
@@ -13,7 +13,7 @@ export function Footer() {
 				<p>
 					Website hosted on <a href="https://github.com/rafa-br34/rafa-br34.dev" className="underline">GitHub</a>
 					<br />
-					Built with {techStack.map(({ name, link }, idx, array) => (
+					Built with {TECH_STACK.map(({ name, link }, idx, array) => (
 						<>
 							{idx > 0 && (idx === array.length - 1 ? ", and " : ", ") || null}
 							<a className="underline" key={name} href={link}>{name}</a>

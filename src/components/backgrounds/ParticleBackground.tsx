@@ -19,25 +19,30 @@ function setNavigating() {
 	) as unknown as number
 }
 
+declare global {
+	var pushStatePatched: boolean | undefined
+	var replaceStatePatched: boolean | undefined
+}
+
 // We monkey patch this because that on chromium browsers the background animation sucks up too much time
 // Thus React doesn't re-flow until the user interacts (scrolls up/down)
 {
 	const { pushState, replaceState } = globalThis.history
 
-	if (!(globalThis as any).pushStatePatched) {
+	if (!globalThis.pushStatePatched) {
 		globalThis.history.pushState = function(...args: Parameters<typeof pushState>) {
 			setNavigating()
 			return pushState.apply(this, args)
 		}
-		;(globalThis as any).pushStatePatched = true
+		globalThis.pushStatePatched = true
 	}
 
-	if (!(globalThis as any).replaceStatePatched) {
+	if (!globalThis.replaceStatePatched) {
 		globalThis.history.replaceState = function(...args: Parameters<typeof replaceState>) {
 			setNavigating()
 			return replaceState.apply(this, args)
 		}
-		;(globalThis as any).replaceStatePatched = true
+		globalThis.replaceStatePatched = true
 	}
 }
 
