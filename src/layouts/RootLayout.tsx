@@ -18,7 +18,7 @@ export function RootLayout(
 	const scrollRef = useRef<HTMLDivElement>(null)
 
 	useEffect(() => {
-		window.history.scrollRestoration = "manual"
+		globalThis.history.scrollRestoration = "manual"
 	}, [])
 
 	useEffect(() => {

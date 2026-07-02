@@ -5,15 +5,19 @@
 	"main": "index.js",
 	"scripts": {
 		"dev": "webpack serve --config webpack.config.mjs --mode development",
-		"build": "webpack --config webpack.config.mjs --mode production",
+		"build": "webpack --config webpack.config.mjs --mode production && node scripts/prerender-blog-posts.mjs",
 		"deploy": "gh-pages -d dist",
-		"format": "dprint fmt"
+		"format": "dprint fmt",
+		"lint": "eslint .",
+		"lint:fix": "eslint . --fix"
 	},
 	"keywords": [],
 	"author": "",
 	"license": "MIT",
 	"type": "commonjs",
 	"devDependencies": {
+		"@mdx-js/loader": "^3.1.1",
+		"@mdx-js/react": "^3.1.1",
 		"@tailwindcss/postcss": "^4.3.0",
 		"@types/react": "^19.2.14",
 		"@types/react-dom": "^19.2.3",
@@ -24,6 +28,7 @@
 		"css-loader": "^7.1.2",
 		"dprint": "^0.53.1",
 		"eslint": "^9.31.0",
+		"eslint-plugin-react-hooks": "^7.1.1",
 		"eslint-webpack-plugin": "^5.0.2",
 		"gh-pages": "^6.3.0",
 		"html-webpack-plugin": "^5.6.3",
@@ -36,6 +41,7 @@
 		"ts-loader": "^9.5.2",
 		"tslib": "^2.8.1",
 		"typescript": "^5.8.3",
+		"typescript-eslint": "^8.62.1",
 		"webpack": "^5.100.2",
 		"webpack-cli": "^6.0.1",
 		"webpack-dev-server": "^5.2.2"
@@ -44,13 +50,19 @@
 		"@base-ui/react": "^1.4.1",
 		"class-variance-authority": "^0.7.1",
 		"clsx": "^2.1.1",
+		"dayjs": "^1.11.21",
 		"decimal.js": "^10.6.0",
 		"lucide-react": "^1.14.0",
 		"react": "^19.2.6",
 		"react-dom": "^19.2.6",
 		"react-helmet-async": "^3.0.0",
 		"react-router-dom": "^7.15.0",
+		"remark-frontmatter": "^5.0.0",
+		"remark-mdx-frontmatter": "^5.2.0",
 		"tailwind-merge": "^3.6.0",
 		"yaml": "^2.8.1"
+	},
+	"allowScripts": {
+		"dprint@0.53.1": true
 	}
 }

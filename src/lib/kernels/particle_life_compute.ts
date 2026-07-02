@@ -45,4 +45,5 @@ export interface ParticleLifeInterface {
 	): void
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const ParticleLifeLoader = compute_kernel_loader as unknown as (moduleArg?: any) => Promise<ParticleLifeInterface>

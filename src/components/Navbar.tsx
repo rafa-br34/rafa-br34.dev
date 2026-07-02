@@ -7,6 +7,7 @@ const pages = [
 	{ label: "Home", to: "/" },
 	{ label: "Gallery", to: "/gallery" },
 	{ label: "Projects", to: "/projects" },
+	{ label: "Blog", to: "/blog" },
 ]
 
 export function Navbar() {
