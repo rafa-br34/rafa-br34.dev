@@ -28,7 +28,7 @@ declare global {
 
 // We monkey patch this because on chromium browsers the background animation sucks up too much time
 // Thus React doesn't re-flow until the user interacts (scrolls up/down)
-if (typeof globalThis.history !== "undefined") {
+if (globalThis.history !== undefined) {
 	const { pushState, replaceState } = globalThis.history
 
 	if (!globalThis.pushStatePatched) {
