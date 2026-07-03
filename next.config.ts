@@ -1,8 +1,9 @@
 import createMDX from "@next/mdx"
 import type { NextConfig } from "next"
 
-import remarkExtractToc from "@stefanprobst/rehype-extract-toc"
-import remarkExtractTocExport from "@stefanprobst/rehype-extract-toc/mdx"
+import withToc from "@stefanprobst/rehype-extract-toc"
+import withTocExport from "@stefanprobst/rehype-extract-toc/mdx"
+import rehypeSlug from "rehype-slug"
 import remarkFrontmatter from "remark-frontmatter"
 import remarkGfm from "remark-gfm"
 import remarkMdxFrontmatter from "remark-mdx-frontmatter"
@@ -13,8 +14,11 @@ const withMDX = createMDX({
 			remarkFrontmatter,
 			remarkMdxFrontmatter,
 			remarkGfm,
-			remarkExtractToc,
-			remarkExtractTocExport,
+		],
+		rehypePlugins: [
+			rehypeSlug,
+			withToc,
+			withTocExport,
 		],
 	},
 })

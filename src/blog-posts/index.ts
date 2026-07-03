@@ -15,6 +15,7 @@ for (const key of mdxContext.keys()) {
 	postsMap[postId] = {
 		Component: val.default as ComponentType,
 		metadata: val.frontmatter,
+		tableOfContents: val.tableOfContents ?? [],
 		id: postId,
 	}
 }

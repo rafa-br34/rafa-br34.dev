@@ -1,3 +1,4 @@
+import type { Toc } from "@stefanprobst/rehype-extract-toc"
 import type { ComponentType } from "react"
 
 export type BlogMetadata = {
@@ -21,5 +22,6 @@ export function checkMetadata(metadata: BlogMetadata) {
 export type BlogPost = {
 	Component: ComponentType
 	metadata: BlogMetadata
+	tableOfContents: Toc
 	id: string
 }
