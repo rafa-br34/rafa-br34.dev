@@ -5,9 +5,11 @@ export default tseslint.config(
 	// Global ignores
 	{
 		ignores: [
+			".next/**",
 			"dist/**",
 			"node_modules/**",
 			"src/wasm/**",
+			"public/wasm/**",
 			"src/components/ui/**", // shadcn/ui generated components
 			"!src/components/ui/_icons.tsx",
 		],
