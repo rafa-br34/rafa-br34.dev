@@ -43,6 +43,7 @@
 		"**/node_modules",
 		"**/*-lock.json",
 		"next-env.d.ts",
+		"public/wasm",
 		"src/wasm/build",
 		"src/wasm/*.js",
 		"src/components/ui/*",

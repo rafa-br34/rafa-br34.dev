@@ -1,3 +1,5 @@
+"use client"
+
 import { useEffect, useRef } from "react"
 
 import { cn } from "@/lib/utils"
@@ -26,7 +28,8 @@ declare global {
 
 // We monkey patch this because that on chromium browsers the background animation sucks up too much time
 // Thus React doesn't re-flow until the user interacts (scrolls up/down)
-{
+// Guard: skip during SSR / static generation where globalThis.history is unavailable.
+if (globalThis.history !== undefined) {
 	const { pushState, replaceState } = globalThis.history
 
 	if (!globalThis.pushStatePatched) {
@@ -207,11 +210,14 @@ export function ParticleBackground(
 			const particleMatrix = new Float32Array(computeKernel.HEAPF32.buffer, allocParticleMatrix, sizeParticleMatrix)
 			const particleTypes = new Uint8Array(computeKernel.HEAPU8.buffer, allocParticleTypes, sizeParticleTypes)
 
+			const forceBeta = Math.random() * 0.3 + 0.2
+
 			for (let i = 0; i < particleMatrixSize * particleMatrixSize; i++) {
 				particleMatrix[i] = 2 * Math.random() - 1
 			}
 
 			console.log(matrixToString(particleMatrixSize, particleMatrix))
+			console.log(forceBeta)
 
 			const spinDirection = Math.random() > 0.5 ? 1 : -1
 			const spinSpeed = 0.05
@@ -340,7 +346,7 @@ export function ParticleBackground(
 				average.push(kernelTime)
 
 				if (average.length >= 30) {
-					console.log(average.reduce((a, b) => a + b) / average.length)
+					console.log(average.reduce((a, b) => a + b, 0) / average.length)
 					average.length = 0
 				}
 

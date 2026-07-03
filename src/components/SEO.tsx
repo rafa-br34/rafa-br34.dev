@@ -1,21 +1,8 @@
-import { Helmet } from "react-helmet-async"
+// SEO is now handled by Next.js Metadata API.
+// This file exists as a no-op for any stale imports.
 
-export function SEO(
-	{
-		title,
-		canonicalPath,
-		description,
-	}: {
-		readonly title: string
-		readonly canonicalPath: string
-		readonly description?: string
-	},
-) {
-	return (
-		<Helmet>
-			<title>{title}</title>
-			<link rel="canonical" href={`https://rafa-br34.dev${canonicalPath}`} />
-			{description && <meta name="description" content={description} />}
-		</Helmet>
-	)
+import type { ReactNode } from "react"
+
+export function SEO(_props: unknown): ReactNode {
+	return null
 }
