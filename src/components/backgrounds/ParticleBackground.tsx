@@ -17,7 +17,7 @@ function setNavigating() {
 		() => {
 			navigating = false
 		},
-		300,
+		500,
 	) as unknown as number
 }
 
@@ -26,26 +26,21 @@ declare global {
 	var replaceStatePatched: boolean | undefined
 }
 
-// We monkey patch this because on chromium browsers the background animation sucks up too much time
-// Thus React doesn't re-flow until the user interacts (scrolls up/down)
-if (globalThis.history !== undefined) {
-	const { pushState, replaceState } = globalThis.history
-
-	if (!globalThis.pushStatePatched) {
-		globalThis.history.pushState = function(...args: Parameters<typeof pushState>) {
-			setNavigating()
-			return pushState.apply(this, args)
-		}
-		globalThis.pushStatePatched = true
-	}
-
-	if (!globalThis.replaceStatePatched) {
-		globalThis.history.replaceState = function(...args: Parameters<typeof replaceState>) {
-			setNavigating()
-			return replaceState.apply(this, args)
-		}
-		globalThis.replaceStatePatched = true
-	}
+// Catch internal link clicks before Next.js starts navigation work.
+if (typeof document !== "undefined") {
+	document.addEventListener(
+		"click",
+		event => {
+			const link = (event.target as Element).closest("a[href]")
+			if (link) {
+				const href = link.getAttribute("href")
+				if (href && (href.startsWith("/") || href.startsWith(globalThis.location.origin))) {
+					setNavigating()
+				}
+			}
+		},
+		{ capture: true },
+	)
 }
 
 function createShader(context: WebGL2RenderingContext, source: string, type: GLenum) {
@@ -314,7 +309,7 @@ export function ParticleBackground(
 
 				// @todo Find a better way than this
 				// Skip 1/4 frames when navigating (Check the monkey patch at the start of the file)
-				if (navigating && frameSkip++ % 4 === 0) {
+				if (navigating && frameSkip++ % 2 === 0) {
 					animationId = requestAnimationFrame(updateFrame)
 					return
 				}
