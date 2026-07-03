@@ -18,7 +18,6 @@
 	(x) = ((x) > (world_size_x)) ? -(world_size_x) : (x); \
 	(y) = ((y) > (world_size_y)) ? -(world_size_y) : (y);
 
-
 #define FORCE_FUNCTION force_fn_normal
 
 static inline float force_fn_normal(float magnitude, float attraction, float beta) {

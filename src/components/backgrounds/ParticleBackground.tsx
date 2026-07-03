@@ -6,49 +6,6 @@ import { cn } from "@/lib/utils"
 
 import { type ParticleLifeInterface, ParticleLifeLoader } from "@/lib/kernels/particle_life_compute"
 
-// @todo This entire file is a mess, revisit later.
-let navigating = false
-let navigatingTimeout = 0
-
-function setNavigating() {
-	navigating = true
-	clearTimeout(navigatingTimeout)
-	navigatingTimeout = setTimeout(
-		() => {
-			navigating = false
-		},
-		300,
-	) as unknown as number
-}
-
-declare global {
-	var pushStatePatched: boolean | undefined
-	var replaceStatePatched: boolean | undefined
-}
-
-// We monkey patch this because that on chromium browsers the background animation sucks up too much time
-// Thus React doesn't re-flow until the user interacts (scrolls up/down)
-// Guard: skip during SSR / static generation where globalThis.history is unavailable.
-if (globalThis.history !== undefined) {
-	const { pushState, replaceState } = globalThis.history
-
-	if (!globalThis.pushStatePatched) {
-		globalThis.history.pushState = function(...args: Parameters<typeof pushState>) {
-			setNavigating()
-			return pushState.apply(this, args)
-		}
-		globalThis.pushStatePatched = true
-	}
-
-	if (!globalThis.replaceStatePatched) {
-		globalThis.history.replaceState = function(...args: Parameters<typeof replaceState>) {
-			setNavigating()
-			return replaceState.apply(this, args)
-		}
-		globalThis.replaceStatePatched = true
-	}
-}
-
 function createShader(context: WebGL2RenderingContext, source: string, type: GLenum) {
 	const shaderHandle = context.createShader(type)
 	context.shaderSource(shaderHandle, source)
@@ -303,20 +260,12 @@ export function ParticleBackground(
 			updateSize()
 
 			let lastFrame = performance.now()
-			let frameSkip = 0
 			const speed = 1 / (1 / 75)
 
 			const average: number[] = []
 
 			function updateFrame(currFrame: number = 0) {
 				if (destroyed || contextLost) {
-					return
-				}
-
-				// @todo Find a better way than this
-				// Skip 1/4 frames when navigating (Check the monkey patch at the start of the file)
-				if (navigating && frameSkip++ % 4 === 0) {
-					animationId = requestAnimationFrame(updateFrame)
 					return
 				}
 

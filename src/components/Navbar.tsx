@@ -1,10 +1,12 @@
 "use client"
 
-import { cn } from "@/lib/utils"
+import clsx from "clsx"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 
-import { NavigationMenu, NavigationMenuItem, NavigationMenuLink, NavigationMenuList } from "./ui/navigation-menu"
+import { NavigationMenu, NavigationMenuItem, NavigationMenuLink, NavigationMenuList } from "@/components/ui/navigation-menu"
+import { GRAYSCALE_BACKDROP } from "@/lib/styles"
+import { cn } from "@/lib/utils"
 
 const pages = [
 	{ label: "Home", href: "/" },
@@ -17,7 +19,7 @@ export function Navbar() {
 	const pathname = usePathname()
 
 	return (
-		<NavigationMenu className="backdrop-grayscale backdrop-brightness-75 backdrop-blur-[1px] h-min border-b max-w-none w-screen justify-center flex-grow-0">
+		<NavigationMenu className={clsx(GRAYSCALE_BACKDROP, "h-min border-b max-w-none w-screen justify-center flex-grow-0")}>
 			<NavigationMenuList>
 				{pages.map(({ label, href }) => {
 					const isActive = href === "/" ? pathname === "/" : pathname.startsWith(href)

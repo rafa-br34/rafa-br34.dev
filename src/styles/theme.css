@@ -7,31 +7,38 @@
 :root {
 	/* Main colors (LIGHT) */
 	--color-theme-bg-0: #FFFFFF;
-	--color-theme-bg-1: #C0C0C0;
+	--color-theme-bg-1: #D0D0D0;
 	--color-theme-bg-2: #B0B0B0;
 	--color-theme-bg-3: #909090;
-	--color-theme-fg-0: #000000;
-	--color-theme-fg-1: #333333;
-	--color-theme-fg-2: #444444;
+	--color-theme-fg-0: #222222;
+	--color-theme-fg-1: #1A1A1A;
+	--color-theme-fg-2: #333333;
+	--color-theme-fg-3: #444444;
 	/* CMY/RGB accents (LIGHT) */
 	--color-theme-c-0: #10FFFF;
 	--color-theme-c-1: #20C0C0;
 	--color-theme-c-2: #408080;
+	--color-theme-c-3: #204040;
 	--color-theme-m-0: #FF10FF;
 	--color-theme-m-1: #C020C0;
 	--color-theme-m-2: #804080;
+	--color-theme-m-3: #402040;
 	--color-theme-y-0: #FFFF40;
 	--color-theme-y-1: #C0C020;
 	--color-theme-y-2: #808010;
+	--color-theme-y-3: #404008;
 	--color-theme-r-0: #FF4040;
 	--color-theme-r-1: #C02020;
 	--color-theme-r-2: #801010;
+	--color-theme-r-3: #400808;
 	--color-theme-g-0: #40FF40;
 	--color-theme-g-1: #20C020;
 	--color-theme-g-2: #108010;
+	--color-theme-g-3: #084008;
 	--color-theme-b-0: #4040FF;
 	--color-theme-b-1: #2020C0;
 	--color-theme-b-2: #101080;
+	--color-theme-b-3: #080840;
 	/* ui-overlays (LIGHT) */
 	--ui-hover-overlay: rgb(0 0 0 / 0.10);
 	--ui-active-overlay: rgb(0 0 0 / 0.15);
@@ -39,8 +46,8 @@
 	--ui-disabled-overlay: rgb(255 255 255 / 0.40);
 	/* shadcn/ui mappings */
 	--radius: 0.35rem;
-	--background: var(--color-theme-fg-0);
-	--foreground: var(--color-theme-bg-2);
+	--background: var(--color-theme-bg-0);
+	--foreground: var(--color-theme-fg-0);
 	--card: var(--color-theme-bg-1);
 	--card-foreground: var(--color-theme-fg-0);
 	--popover: var(--color-theme-bg-1);
@@ -80,27 +87,34 @@
 	--color-theme-bg-2: #333333;
 	--color-theme-bg-3: #444444;
 	--color-theme-fg-0: #FFFFFF;
-	--color-theme-fg-1: #E0E0E0;
-	--color-theme-fg-2: #999999;
+	--color-theme-fg-1: #D0D0D0;
+	--color-theme-fg-2: #B0B0B0;
+	--color-theme-fg-3: #909090;
 	/* CMY/RGB accents (DARK) */
 	--color-theme-c-0: #108080;
 	--color-theme-c-1: #20C0C0;
 	--color-theme-c-2: #40E0E0;
+	--color-theme-c-3: #80FFFF;
 	--color-theme-m-0: #801080;
 	--color-theme-m-1: #C020C0;
 	--color-theme-m-2: #E040E0;
+	--color-theme-m-3: #FF80FF;
 	--color-theme-y-0: #808010;
 	--color-theme-y-1: #C0C020;
 	--color-theme-y-2: #E0E040;
+	--color-theme-y-3: #FFFF80;
 	--color-theme-r-0: #801010;
 	--color-theme-r-1: #C02020;
 	--color-theme-r-2: #E04040;
+	--color-theme-r-3: #FF8080;
 	--color-theme-g-0: #108010;
 	--color-theme-g-1: #20C020;
 	--color-theme-g-2: #40E040;
+	--color-theme-g-3: #80FF80;
 	--color-theme-b-0: #101080;
 	--color-theme-b-1: #2020C0;
 	--color-theme-b-2: #4040E0;
+	--color-theme-b-3: #8080FF;
 	/* ui-overlays (DARK) */
 	--ui-hover-overlay: rgb(255 255 255 / 0.05);
 	--ui-active-overlay: rgb(255 255 255 / 0.10);
@@ -121,21 +135,27 @@
 	--color-theme-c-0: var(--color-theme-c-0);
 	--color-theme-c-1: var(--color-theme-c-1);
 	--color-theme-c-2: var(--color-theme-c-2);
+	--color-theme-c-3: var(--color-theme-c-3);
 	--color-theme-m-0: var(--color-theme-m-0);
 	--color-theme-m-1: var(--color-theme-m-1);
 	--color-theme-m-2: var(--color-theme-m-2);
+	--color-theme-m-3: var(--color-theme-m-3);
 	--color-theme-y-0: var(--color-theme-y-0);
 	--color-theme-y-1: var(--color-theme-y-1);
 	--color-theme-y-2: var(--color-theme-y-2);
+	--color-theme-y-3: var(--color-theme-y-3);
 	--color-theme-r-0: var(--color-theme-r-0);
 	--color-theme-r-1: var(--color-theme-r-1);
 	--color-theme-r-2: var(--color-theme-r-2);
+	--color-theme-r-3: var(--color-theme-r-3);
 	--color-theme-g-0: var(--color-theme-g-0);
 	--color-theme-g-1: var(--color-theme-g-1);
 	--color-theme-g-2: var(--color-theme-g-2);
+	--color-theme-g-3: var(--color-theme-g-3);
 	--color-theme-b-0: var(--color-theme-b-0);
 	--color-theme-b-1: var(--color-theme-b-1);
 	--color-theme-b-2: var(--color-theme-b-2);
+	--color-theme-b-3: var(--color-theme-b-3);
 	/* ui-overlay */
 	--color-ui-hover: var(--ui-hover-overlay);
 	--color-ui-active: var(--ui-active-overlay);
@@ -174,7 +194,7 @@
 	--color-card: var(--card);
 	--color-foreground: var(--foreground);
 	--color-background: var(--background);
-	/* === Radii === */
+	/* Radius */
 	--radius-sm: calc(var(--radius) - 4px);
 	--radius-md: calc(var(--radius) - 2px);
 	--radius-lg: var(--radius);

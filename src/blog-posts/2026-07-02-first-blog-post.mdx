@@ -1,10 +1,39 @@
 ---
-postId: "2026-07-02-first-blog-post"
 title: First blog post
 desc: My first blog post!
 date: 2026-07-02T07:49-03:00
 tags: ["announcement", "meta", "misc"]
+id: "2026-07-02-first-blog-post"
 ---
 
+import { DemoGraph } from "@/components/blog/DemoGraph"
 
-# Test
+# Welcome to the blog!
+
+After way too much time I finally decided to upgrade this website (*with a blog*, out of all possible things).
+Now, the reason as to why a blog, mostly because then I can share and archive my more interesting work. It might also motivate me to get actually publishable results.
+Of course there isn't much to write in a "first blog post" post, well, other than the tech stack, and a general demo I guess.
+
+## The tech stack
+
+For the tech stack I used [MDX](https://mdxjs.com/), mostly because it is **absurdly** customizable, and allows for inline React components (which I totally wont spam *smirk*).  
+For instance, if I wish to do so I can just plop down a chart like so:
+<DemoGraph/>
+
+I actually plan to use a more.. interesting graph library than the one provided by `shadcn/ui` eventually, like [Plotly](https://plotly.com/javascript/) (which is closer to matplotlib it seems) but for right now it would end up being way overkill.
+It is also totally doable to use something like [ThreeJS](https://threejs.org/), for example this [ThreeJS example](https://threejs.org/examples/#webgl_multiple_elements_text), which was what actually inspired me to use MDX.  
+Needless to say, this opens up a *lot* of possibilities especially for things like interactive demos.
+I might also setup something like [Shiki](https://shiki.style/) for code blocks eventually but as of writing this codeblocks are not supported.
+
+## Integration issues
+
+Honestly, I would like to say it worked first try and setup was a breeze, but unfortunately I can't lol.
+I actually needed to change from Webpack to Next.js just to get this working.
+Manually setting up the `mdx-components.tsx` is also quite something, although there are themes for it ([nextra](https://nextra.site/docs/file-conventions/mdx-components-file) for example).
+But of course after you get past that initial setup everything else becomes very easy.  
+Having more things to customize (and thus setup) also inherently mean you do end up having more control over what you want, which is always nice.
+
+## Conclusion
+
+To conclude this.. well, there isn't much to conclude this. Other than the fact that now I have a blog.
+Which hopefully means more cool things to come in the not so far future.
