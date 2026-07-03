@@ -56,10 +56,10 @@ export default async function BlogPost(
 		notFound()
 	}
 
-	const { Component, metadata } = post
+	const { Component, metadata, tableOfContents } = post
 
 	return (
-		<BlogPostContent metadata={metadata}>
+		<BlogPostContent metadata={metadata} toc={tableOfContents}>
 			<Component />
 		</BlogPostContent>
 	)

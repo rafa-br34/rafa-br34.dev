@@ -1,5 +1,6 @@
 "use client"
 
+import type { Toc } from "@stefanprobst/rehype-extract-toc"
 import clsx from "clsx"
 import dayjs from "dayjs"
 import Link from "next/link"
@@ -7,10 +8,12 @@ import Link from "next/link"
 import type { BlogMetadata } from "@/lib/blog-post"
 import { GRAYSCALE_BACKDROP } from "@/lib/styles"
 
+import TableOfContents from "@/components/blog/TableOfContents"
 import { Badge } from "@/components/ui/badge"
+import { cn } from "@/lib/utils"
 
 export default function BlogPostContent(
-	{ children, metadata }: { readonly children: React.ReactNode; readonly metadata: BlogMetadata },
+	{ children, metadata, toc }: { readonly children: React.ReactNode; readonly metadata: BlogMetadata; readonly toc: Toc },
 ) {
 	const {
 		date: postDate,
@@ -23,26 +26,36 @@ export default function BlogPostContent(
 		<article className={clsx(GRAYSCALE_BACKDROP, "container mx-auto h-full px-4 py-8 max-w-6xl")}>
 			<Link
 				href="/blog"
-				className="inline-block mb-6 px-3 py-2 bg-theme-bg-0 rounded-md text-theme-fg-2 hover:text-theme-fg-0 transition-colors text-sm"
+				className={cn(
+					"inline-block mb-6 px-3 py-2 bg-theme-bg-0 rounded-lg text-theme-fg-2 hover:text-theme-fg-0 text-sm",
+					"border border-theme-fg-3 hover:border-theme-fg-1 transition-colors",
+				)}
 			>
 				⇚ Back to blog
 			</Link>
 
-			<header className="mb-4 border-b pb-4">
-				<h1 className="text-3xl font-bold mb-2">{postTitle}</h1>
-				<p className="text-sm text-theme-fg-1 mb-2">{postDesc}</p>
-				<time className="text-sm text-theme-fg-2" dateTime={postDate}>
-					{dayjs(postDate).format("YYYY-MM-DD HH:mm")}
-				</time>
-				{postTags.length > 0 && (
-					<div className="flex flex-wrap gap-2 mt-3">
-						{postTags.map(tag => <Badge variant="secondary" key={tag}>{tag}</Badge>)}
-					</div>
-				)}
-			</header>
+			<div className="grid grid-cols-5 gap-2">
+				<div className="col-span-4">
+					<header className="mb-4 border-b pb-4">
+						<h1 className="text-3xl font-bold mb-2">{postTitle}</h1>
+						<p className="text-sm text-theme-fg-1 mb-2">{postDesc}</p>
+						<time className="text-sm text-theme-fg-2" dateTime={postDate}>
+							{dayjs(postDate).format("YYYY-MM-DD HH:mm")}
+						</time>
 
-			<div className="prose prose-invert max-w-none">
-				{children}
+						{postTags.length > 0 && (
+							<div className="flex flex-wrap gap-2 mt-3">
+								{postTags.map(tag => <Badge variant="secondary" key={tag}>{tag}</Badge>)}
+							</div>
+						)}
+					</header>
+
+					<div className="prose prose-invert max-w-none">
+						{children}
+					</div>
+				</div>
+
+				<TableOfContents className="col-span-1" toc={toc} />
 			</div>
 		</article>
 	)

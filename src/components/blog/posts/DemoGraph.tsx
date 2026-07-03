@@ -23,7 +23,7 @@ export function DemoGraph() {
 	useEffect(() => {
 		const entries = []
 
-		for (let index = 0; index < 16; index++) {
+		for (let index = 1; index <= 16; index++) {
 			entries.push({ index, r: Math.random() * 255, g: Math.random() * 255, b: Math.random() * 255 })
 		}
 

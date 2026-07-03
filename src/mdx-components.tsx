@@ -1,7 +1,7 @@
 import type { MDXComponents } from "mdx/types"
+import type { HTMLAttributes, ImgHTMLAttributes } from "react"
 
-import { HTMLAttributes, ImgHTMLAttributes } from "react"
-import { DemoGraph } from "./components/blog/DemoGraph"
+import { DemoGraph } from "@/components/blog/posts/DemoGraph"
 import { cn } from "./lib/utils"
 
 const HEADER_STYLING = "scroll-m-20 mt-6 first:mt-0 mb-2 font-semibold tracking-tight"
