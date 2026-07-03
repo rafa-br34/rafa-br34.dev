@@ -1,13 +1,13 @@
+"use client"
 import { useState } from "react"
 
-import { SEO } from "../../components/SEO"
-import type { Artist, Artwork } from "../../lib/catalog"
-import { GalleryGrid } from "./components/GalleryGrid"
-import { GalleryLoadingMask } from "./components/GalleryLoadingMask"
-import { GalleryOverlay } from "./components/GalleryOverlay"
-import { useCatalog } from "./hooks/useCatalog"
+import type { Artist, Artwork } from "@/lib/catalog"
+import { GalleryGrid } from "./_components/GalleryGrid"
+import { GalleryLoadingMask } from "./_components/GalleryLoadingMask"
+import { GalleryOverlay } from "./_components/GalleryOverlay"
+import { useCatalog } from "./_hooks/useCatalog"
 
-export function Gallery() {
+export default function GalleryContent() {
 	const { catalog, loading, error } = useCatalog()
 	const [selected, setSelected] = useState<{ artist: Artist; artwork: Artwork } | null>(null)
 
@@ -21,8 +21,6 @@ export function Gallery() {
 
 	return (
 		<>
-			<SEO title="Gallery - rafa_br34" canonicalPath="/gallery" />
-
 			{loading && <GalleryLoadingMask />}
 
 			{catalog && (

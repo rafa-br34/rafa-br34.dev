@@ -36,4 +36,5 @@ function getAlternative(itemArtist: Artist, itemArtwork: Artwork) {
 	return `${itemArtwork.type} from ${itemArtist.name} titled ${itemArtwork.file}`
 }
 
-export { Artist, Artwork, Catalog, getAlternative, getResource, SocialMedia }
+export type { Artist, Artwork, Catalog, SocialMedia }
+export { getAlternative, getResource }

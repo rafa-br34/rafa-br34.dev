@@ -1,7 +1,9 @@
+"use client"
+
 const TECH_STACK = [
 	{ name: "React", link: "https://react.dev/" },
 	{ name: "Tailwind", link: "https://tailwindcss.com/" },
-	{ name: "Webpack", link: "https://webpack.js.org/" },
+	{ name: "Next.js", link: "https://nextjs.org/" },
 	{ name: "TypeScript", link: "https://www.typescriptlang.org/" },
 	{ name: "Emscripten", link: "https://emscripten.org/" },
 ]
@@ -14,10 +16,10 @@ export function Footer() {
 					Website hosted on <a href="https://github.com/rafa-br34/rafa-br34.dev" className="underline">GitHub</a>
 					<br />
 					Built with {TECH_STACK.map(({ name, link }, idx, array) => (
-						<>
+						<span key={name}>
 							{idx > 0 && (idx === array.length - 1 ? ", and " : ", ") || null}
-							<a className="underline" key={name} href={link}>{name}</a>
-						</>
+							<a className="underline" href={link}>{name}</a>
+						</span>
 					))}
 				</p>
 				<p>
