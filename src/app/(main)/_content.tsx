@@ -123,7 +123,7 @@ export default function HomeContent() {
 						</div>
 					</div>
 
-					<div className="sm:col-span-1 flex items-center justify-center aspect-square">
+					<div className="sm:col-span-1 flex justify-center aspect-square">
 						<div className="text-center">
 							<img
 								src="/assets/artwork/gummi_arts_stare.png"
