@@ -821,8 +821,8 @@ Here are the results, from worst to best
 ![optim_target_o_pastelzera_headshot.png norm_sigmoid animated result](out-optim_target_o_pastelzera_headshot.png-norm_sigmoid-1788407794-animated.webp)
 
 From these results we can clearly see that `smoothstep`, `tanh`, and `sigmoid` work the best. While `atan` and `atanx` fail very poorly at it.  
-Now to me personally it isn't 100% clear why `atan` and `atanx` fails this badly, but I think it's somewhat safe to assume that that's caused because of `atan` decaying slowly thus having large gradients.
-Which causes the optimizer to try and optimize for "everything" at once, thus resulting in a very mediocre average. 
+Now to me personally it isn't 100% clear why `atan` and `atanx` fails this badly.
+But I think it's somewhat safe to assume that that's caused because `atan` decays slowly, which causes the optimizer to try and optimize for "everything" at once, thus resulting in a very mediocre average.
 
 ### Final results
 

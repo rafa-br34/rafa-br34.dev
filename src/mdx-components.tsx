@@ -21,13 +21,13 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
 		a: ({ className, ...props }) => <a className={cn("font-medium text-theme-fg-1 underline", className)} {...props} />,
 		p: ({ className, ...props }) => <p className={cn("leading-6 pb-2 text-sm/5", className)} {...props} />,
 
-		ul: ({ className, ...props }) => <ul className={cn("my-0 pl-4 list-disc", className)} {...props} />,
-		ol: ({ className, ...props }) => <ol className={cn("my-0 pl-4 list-decimal", className)} {...props} />,
+		ul: ({ className, ...props }) => <ul className={cn("my-0 pl-4 pb-2 list-disc", className)} {...props} />,
+		ol: ({ className, ...props }) => <ol className={cn("my-0 pl-4 pb-2 list-decimal", className)} {...props} />,
 		li: ({ className, ...props }) => <li className={cn("my-0 ml-3 text-sm/5", className)} {...props} />,
 
 		blockquote: ({ className, ...props }) => <blockquote className={cn(BLOCKQUOTE_STYLING, className)} {...props} />,
 
-		img: ({ className, alt, ...props }: ImgHTMLAttributes<HTMLImageElement>) => <img className={cn("rounded-md border", className)} alt={alt} {...props} />,
+		img: ({ className, alt, ...props }: ImgHTMLAttributes<HTMLImageElement>) => <img className={cn("rounded-md border my-1", className)} alt={alt} {...props} />,
 
 		hr: ({ className, ...props }) => <hr className={cn("my-4 border md:my-8", className)} {...props} />,
 
@@ -45,7 +45,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
 		th: ({ className, ...props }) => (
 			<th
 				className={cn(
-					"border-b border-r px-2.5 py-1 text-left font-bold [&[align=center]]:text-center [&[align=right]]:text-right last:border-r-0 [tr:last-child_&]:border-b-0",
+					"border-b border-r px-2.5 py-1 text-left font-bold [&[align=center]]:text-center [&[align=right]]:text-right last:border-r-0 [tbody_tr:last-child_&]:border-b-0",
 					className,
 				)}
 				{...props}
@@ -54,7 +54,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
 		td: ({ className, ...props }) => (
 			<td
 				className={cn(
-					"border-b border-r px-2.5 py-1 text-left [&[align=center]]:text-center [&[align=right]]:text-right last:border-r-0 [tr:last-child_&]:border-b-0",
+					"border-b border-r px-2.5 py-1 text-left [&[align=center]]:text-center [&[align=right]]:text-right last:border-r-0 [tbody_tr:last-child_&]:border-b-0",
 					className,
 				)}
 				{...props}

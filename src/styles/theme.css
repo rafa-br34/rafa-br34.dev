@@ -218,3 +218,13 @@
 		outline-color: var(--border);
 	}
 }
+
+/*
+ * KaTeX (katex.min.css) gives .katex its own line-height of 1.2.
+ * When inline math sits inside a paragraph that line-height adds a strut of its own.
+ * Thus stretching the line box and leaving a visible gap under the line.
+ * Collapse it so math rows keep the paragraph's rhythm.
+ */
+.katex {
+	line-height: 0;
+}
