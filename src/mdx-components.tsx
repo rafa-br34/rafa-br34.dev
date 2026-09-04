@@ -33,7 +33,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
 
 		table: ({ className, ...props }: HTMLAttributes<HTMLTableElement>) => (
 			<div className="my-2 w-full overflow-y-auto">
-				<table className={cn("w-full", className)} {...props} />
+				<table className={cn("w-full text-sm", className)} {...props} />
 			</div>
 		),
 		tr: ({ className, ...props }: HTMLAttributes<HTMLTableRowElement>) => (
@@ -45,7 +45,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
 		th: ({ className, ...props }) => (
 			<th
 				className={cn(
-					"border px-4 py-2 text-left font-bold [&[align=center]]:text-center [&[align=right]]:text-right",
+					"border px-2.5 py-1 text-left font-bold [&[align=center]]:text-center [&[align=right]]:text-right",
 					className,
 				)}
 				{...props}
@@ -54,7 +54,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
 		td: ({ className, ...props }) => (
 			<td
 				className={cn(
-					"border px-4 py-2 text-left [&[align=center]]:text-center [&[align=right]]:text-right",
+					"border px-2.5 py-1 text-left [&[align=center]]:text-center [&[align=right]]:text-right",
 					className,
 				)}
 				{...props}
