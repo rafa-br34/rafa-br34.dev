@@ -19,11 +19,11 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
 		h6: ({ className, children, ...props }) => <h6 className={cn(HEADER_STYLING, "text-base", className)} {...props}>{children}</h6>,
 
 		a: ({ className, ...props }) => <a className={cn("font-medium text-theme-fg-1 underline", className)} {...props} />,
-		p: ({ className, ...props }) => <p className={cn("leading-6 text-sm/6 ", className)} {...props} />,
+		p: ({ className, ...props }) => <p className={cn("leading-6 pb-2 text-sm/5", className)} {...props} />,
 
-		ul: ({ className, ...props }) => <ul className={cn("my-6 ml-6 list-disc", className)} {...props} />,
-		ol: ({ className, ...props }) => <ol className={cn("my-6 ml-6 list-decimal", className)} {...props} />,
-		li: ({ className, ...props }) => <li className={cn("mt-2", className)} {...props} />,
+		ul: ({ className, ...props }) => <ul className={cn("my-0 pl-4 list-disc", className)} {...props} />,
+		ol: ({ className, ...props }) => <ol className={cn("my-0 pl-4 list-decimal", className)} {...props} />,
+		li: ({ className, ...props }) => <li className={cn("my-0 ml-3 text-sm/5", className)} {...props} />,
 
 		blockquote: ({ className, ...props }) => <blockquote className={cn(BLOCKQUOTE_STYLING, className)} {...props} />,
 
@@ -32,8 +32,8 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
 		hr: ({ className, ...props }) => <hr className={cn("my-4 border md:my-8", className)} {...props} />,
 
 		table: ({ className, ...props }: HTMLAttributes<HTMLTableElement>) => (
-			<div className="my-2 w-full overflow-y-auto">
-				<table className={cn("w-full text-sm", className)} {...props} />
+			<div className="my-2 w-full overflow-x-auto rounded-md border">
+				<table className={cn("w-full border-separate border-spacing-0 text-sm", className)} {...props} />
 			</div>
 		),
 		tr: ({ className, ...props }: HTMLAttributes<HTMLTableRowElement>) => (
@@ -45,7 +45,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
 		th: ({ className, ...props }) => (
 			<th
 				className={cn(
-					"border px-2.5 py-1 text-left font-bold [&[align=center]]:text-center [&[align=right]]:text-right",
+					"border-b border-r px-2.5 py-1 text-left font-bold [&[align=center]]:text-center [&[align=right]]:text-right last:border-r-0 [tr:last-child_&]:border-b-0",
 					className,
 				)}
 				{...props}
@@ -54,7 +54,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
 		td: ({ className, ...props }) => (
 			<td
 				className={cn(
-					"border px-2.5 py-1 text-left [&[align=center]]:text-center [&[align=right]]:text-right",
+					"border-b border-r px-2.5 py-1 text-left [&[align=center]]:text-center [&[align=right]]:text-right last:border-r-0 [tr:last-child_&]:border-b-0",
 					className,
 				)}
 				{...props}
