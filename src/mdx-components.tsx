@@ -2,11 +2,12 @@ import type { MDXComponents } from "mdx/types"
 import type { HTMLAttributes, ImgHTMLAttributes } from "react"
 
 import { Callout } from "@/components/blog/Callout"
-import { DemoGraph } from "@/components/blog/posts/DemoGraph"
 import { cn } from "./lib/utils"
 
-const HEADER_STYLING = "mt-4 first:mt-0 mb-2 font-semibold tracking-tight"
+const HEADER_STYLING = "mt-3 first:mt-0 mb-2 font-semibold tracking-tight"
 const BLOCKQUOTE_STYLING = "border-l-2 mt-2 border-fg-3 pl-6 italic text-fg-2 [&>*]:text-fg-3"
+
+import { BLOG_COMPONENTS } from "./components/blog/BlogComponents"
 
 export function useMDXComponents(components: MDXComponents): MDXComponents {
 	return {
@@ -18,7 +19,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
 		h6: ({ className, children, ...props }) => <h6 className={cn(HEADER_STYLING, "text-base", className)} {...props}>{children}</h6>,
 
 		a: ({ className, ...props }) => <a className={cn("font-medium text-theme-fg-1 underline", className)} {...props} />,
-		p: ({ className, ...props }) => <p className={cn("leading-6 text-sm/6 [&:not(:first-child)]:mt-2", className)} {...props} />,
+		p: ({ className, ...props }) => <p className={cn("leading-6 text-sm/6 ", className)} {...props} />,
 
 		ul: ({ className, ...props }) => <ul className={cn("my-6 ml-6 list-disc", className)} {...props} />,
 		ol: ({ className, ...props }) => <ol className={cn("my-6 ml-6 list-decimal", className)} {...props} />,
@@ -31,7 +32,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
 		hr: ({ className, ...props }) => <hr className={cn("my-4 border md:my-8", className)} {...props} />,
 
 		table: ({ className, ...props }: HTMLAttributes<HTMLTableElement>) => (
-			<div className="my-6 w-full overflow-y-auto">
+			<div className="my-2 w-full overflow-y-auto">
 				<table className={cn("w-full", className)} {...props} />
 			</div>
 		),
@@ -79,10 +80,10 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
 			/>
 		),
 
-		...components,
-
-		// 2026-07-02-first-blog-post
-		DemoGraph,
+		// General
 		Callout,
+
+		...components,
+		...BLOG_COMPONENTS,
 	}
 }

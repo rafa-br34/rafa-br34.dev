@@ -3,7 +3,7 @@ title: Exploring 2D differentiable rendering
 desc: Going in-depth how 2D differentiable rendering works and reimplementing it using PyTorch.
 date: 2026-08-16T16:40-03:00
 edit: 2026-08-30T05:00-03:00
-tags: ["ai/ml", "rendering", "gradients"]
+tags: ["ai/ml", "rasterization", "gradients"]
 id: "2026-08-16-differentiable-rendering"
 ---
 
@@ -797,8 +797,8 @@ And well.. It does work..
 
 ### Normalization tests
 
-So to begin I'll test multiple normalizations.  
-From worst to best
+So to begin with I tested multiple normalizations.  
+Here are the results, from worst to best
 
 `atan`:  
 ![optim_target_o_pastelzera_headshot.png norm_atan final result](out-optim_target_o_pastelzera_headshot.png-norm_atan-1788403500-final.png)
@@ -820,27 +820,52 @@ From worst to best
 ![optim_target_o_pastelzera_headshot.png norm_sigmoid final result](out-optim_target_o_pastelzera_headshot.png-norm_sigmoid-1788407794-final.png)
 ![optim_target_o_pastelzera_headshot.png norm_sigmoid animated result](out-optim_target_o_pastelzera_headshot.png-norm_sigmoid-1788407794-animated.webp)
 
+From these results we can clearly see that `smoothstep`, `tanh`, and `sigmoid` work the best. While `atan` and `atanx` fail very poorly at it.  
+Now to me personally it isn't 100% clear why `atan` and `atanx` fails this badly, but I think it's somewhat safe to assume that that's caused because of `atan` decaying slowly thus having large gradients.
+Which causes the optimizer to try and optimize for "everything" at once, thus resulting in a very mediocre average. 
+
+### Final results
+
+`smoothstep`:  
+![optim_target_gummi_art.png norm_smoothstep final result](out-optim_target_gummi_art.png-norm_smoothstep-1788488037-final.png)
+![optim_target_gummi_art.png norm_smoothstep animated result](out-optim_target_gummi_art.png-norm_smoothstep-1788488037-animated.webp)
+
+`tanh`:  
+![optim_target_gummi_art.png norm_tanh final result](out-optim_target_gummi_art.png-norm_tanh-1788479135-final.png)
+![optim_target_gummi_art.png norm_tanh animated result](out-optim_target_gummi_art.png-norm_tanh-1788479135-animated.webp)
+
+`sigmoid`:  
+![optim_target_gummi_art.png norm_sigmoid final result](out-optim_target_gummi_art.png-norm_smoothstep-1788488037-final.png)
+![optim_target_gummi_art.png norm_sigmoid animated result](out-optim_target_gummi_art.png-norm_smoothstep-1788488037-animated.webp)
+
+
 ## Possible improvements
 
-So.. we have proven it works, and the idea *is* solid.  So what's next?  
+So.. we have proven it works, and the idea *is* solid.  
+So what's next?  
 
 1. We barely touched the hyper-parameters, optimizers, and how initialization is performed.  
+We also have seen that `sigmoid` does overall end up with a better generalization, but `smoothstep` gives us crispy edges. So what if we mix them both?  
+We could also try to optimize in multiple steps, instead of doing it in one go we do smaller optimization runs each one trying to decrease the difference of the target image.
 2. It *urgently* needs to be optimized, we are allocating a tensor of size `WxH` for *every* line, no matter if that line is visible or has a radius of zero. Which as you can imagine isn't great when we're trying to optimize thousands of lines on larger images (a 550x220 image with 5k lines takes up basically 30GiB of VRAM, which shows its innefficiencies).  
 We can optimize it by splitting the area in which lines reside by 4 quadrants in the image, but this also has its own drawbacks (how will we deal with lines that go outside those quadrants?).  
 Another way is to perform bucketing, why allocate a huge `NxWxH` tensor when we can allocate a `Nx16x16` tensor for all primitives that use less than 16x16 of screen space?  
 I'm pretty sure DiffVG and alike are clever enough to pretty much not have this issue, but I haven't studied them in-depth yet so I can't say for certain.
 3. Doing cooler stuff.  
-No but seriously, so far we frankly just have optimized 2D images into 2D images, this same idea can be used for 3D geometry. But that will be for a much later date.
+No but seriously, so far we just have optimized 2D images into 2D images, this same idea can be used for 3D geometry.
+However, that will be for a much later date.
 
 Of course we could solve most of these problems just by cloning DiffVG, but what's the fun in that?  
-I would much rather test out [triton](https://triton-lang.org/main/index.html) or [taichi](https://www.taichi-lang.org/) than dealing with compiling DiffVG personally. That would also mean finding out the derivatives of complex functions by hand, but that's something I will need to learn one time or another either way.
+I would much rather test out [triton](https://triton-lang.org/main/index.html) or [taichi](https://www.taichi-lang.org/) than just compiling DiffVG.  
+That would also mean finding out the derivatives of complex functions by hand, but that's something I will need to learn one time or another either way.
 
 ## Conclusion
 
-Well this concludes this blog post, I believe that differentiable rendering perfectly illustrates how there really isn't a wrong or right in ML, and that things that work great in one scenario work completely different in another.  
-To give my own personal opinion about this, it isn't just about how useful differentiable rendering truly is, I think this is more about understanding and demonstrating why gradient descent is such a powerful algorithm for optimization problems. As you can imagine, this isn't limited to just optimizing lines to raster images.
+Well this concludes this blog post, I believe that differentiable rendering perfectly illustrates how there really isn't a true right or wrong in ML, and that things that work great in one scenario work completely different in another.  
+To give my own personal opinion about this, it isn't just about how useful differentiable rendering truly is, I think this is more about understanding and demonstrating why gradient descent is such a powerful algorithm for optimization problems.
+As you can imagine, this isn't limited to just optimizing lines to raster images.
 
 ## Acknowledgements
 
 Special thanks to [Exulan](https://exulan.com) for providing the compute resources needed this!  
-Demonstration images used courtesy of [Gummi_art](https://bsky.app/profile/gummiart.bsky.social) and [o_pastelzera](linktr.ee/o_pastelzera).
+Demonstration images used courtesy of [o_pastelzera](linktr.ee/o_pastelzera) and [Gummi_art](https://bsky.app/profile/gummiart.bsky.social).
