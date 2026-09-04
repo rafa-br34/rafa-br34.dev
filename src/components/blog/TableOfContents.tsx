@@ -1,9 +1,9 @@
 "use client"
 
+import type { Toc, TocEntry } from "@stefanprobst/rehype-extract-toc"
 import { useCallback, useEffect, useRef, useState } from "react"
 
 import { cn } from "@/lib/utils"
-import type { Toc, TocEntry } from "@stefanprobst/rehype-extract-toc"
 
 function TocItem({ entry, activeId, depth = 0 }: { readonly entry: TocEntry; readonly activeId: string | null; readonly depth?: number }) {
 	const hasChildren = entry.children && entry.children.length > 0
@@ -14,10 +14,10 @@ function TocItem({ entry, activeId, depth = 0 }: { readonly entry: TocEntry; rea
 			<a
 				href={entry.id ? `#${entry.id}` : undefined}
 				className={cn(
-					"block py-0.5 text-sm transition-colors hover:text-theme-fg-0",
+					"block py-0.5 text-sm transition-colors",
 					"border-l-2 border-transparent pl-2",
-					isActive && "border-theme-fg-1 text-theme-fg-0 font-base",
-					!isActive && "text-theme-fg-2",
+					isActive && "border-theme-fg-0 text-theme-fg-0 font-base",
+					!isActive && "text-theme-fg-2 hover:text-theme-fg-1 hover:border-theme-fg-2",
 				)}
 				style={{ paddingLeft: `${(depth + 1) * 0.5 + 0.25}rem` }}
 			>
@@ -69,7 +69,7 @@ export default function TableOfContents({ className, toc }: { readonly className
 
 	return (
 		<aside className={cn("sticky top-24 max-h-screen overflow-y-auto overflow-x-clip", className)}>
-			<h2 className="text-xs font-semibold uppercase tracking-wider text-theme-fg-3 mb-3">
+			<h2 className="text-base font-semibold text-center tracking-wider text-theme-fg-3 mb-2">
 				Table of contents
 			</h2>
 			<nav>

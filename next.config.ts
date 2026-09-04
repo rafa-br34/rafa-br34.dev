@@ -6,6 +6,7 @@ import withToc from "@stefanprobst/rehype-extract-toc"
 import withTocExport from "@stefanprobst/rehype-extract-toc/mdx"
 import type { Element, Root } from "hast"
 import { isElement } from "hast-util-is-element"
+import type { MdxJsxFlowElement } from "mdast-util-mdx-jsx"
 import rehypeKatex from "rehype-katex"
 import rehypeSlug from "rehype-slug"
 import remarkFrontmatter from "remark-frontmatter"
@@ -63,6 +64,21 @@ function rehypeBlogAssets() {
 		}
 
 		visit(tree, node => {
+			if (node.type === "mdxJsxFlowElement") {
+				const jsxElement = node as MdxJsxFlowElement
+				if (jsxElement.name !== "img" || !jsxElement.attributes) {
+					return
+				}
+
+				for (const attribute of jsxElement.attributes) {
+					if (attribute.type === "mdxJsxAttribute" && attribute.name === "src" && typeof attribute.value === "string") {
+						attribute.value = rewriteAssetSource(attribute.value, base)
+					}
+				}
+
+				return
+			}
+
 			if (isElement(node) && node.tagName === "img") {
 				const { src } = node.properties
 
