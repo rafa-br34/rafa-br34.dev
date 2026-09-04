@@ -18,7 +18,7 @@ Now, by itself, differentiable rendering won't solve all problems depending on w
 
 SDFs play a huge part in 2D differentiable rendering (and I'd guess 3D DR too), so we first have to understand how they work.  
 In principle, SDFs are really simple: we just want to define a function that, given `x`, `y`, and whatever other parameters your primitive needs (e.g., `Px`, `Py`, `Pradius` for a circle) it returns a new `z` value.  
-If this `z` value is positive (>0) then we're inside the primitive, otherwise if it is negative (<0) we're outside the primitive (hence the *signed* in the name).  
+If this `z` value is positive (>0) then we're inside the primitive, otherwise if it is negative (\<0) we're outside the primitive (hence the *signed* in the name).  
 > [!IMPORTANT]
 > Sign conventions change across the literature.  
 > What I will be using here (positive inside, negative outside) is perfectly valid. But most adopt the opposite (negative inside, positive outside).  
@@ -27,18 +27,17 @@ If this `z` value is positive (>0) then we're inside the primitive, otherwise if
 
 For example, to define a circle, we can use the following:  
 
-$$
-D\left(a_{x},a_{y},b_{x},b_{y}\right)=\sqrt{\left(a_{x}-b_{x}\right)^{2}+\left(a_{y}-b_{y}\right)^{2}}
-\\
-D_{Circle}\left(v_{x},v_{y},p_{x},\ p_{y},p_{r}\right)=p_{r}-D\left(v_{x},\ v_{y},p_{x},p_{y}\right)
-$$
+$D\left(a_{x},a_{y},b_{x},b_{y}\right)=\sqrt{\left(a_{x}-b_{x}\right)^{2}+\left(a_{y}-b_{y}\right)^{2}}$  
+$D_{Circle}\left(v_{x},v_{y},p_{x},\ p_{y},p_{r}\right)=p_{r}-D\left(v_{x},\ v_{y},p_{x},p_{y}\right)$  
+
 Where $v_x,v_y$ are our current grid position, $p_x,p_y$ are the position of our circle, and $p_r$ is the radius of our circle.  
 Here we are literally just measuring the distance (the $D$ function) to a point and adding a threshold ($p_r$) to make a circle.  
 Obviously, we can also negate the function (so that $z = -D_{Circle}(...)$) so that negative is inside the shape and positive is outside.  
 Now, if we graph it, we get the following:  
 
+```
 <SDFInteractiveGraph
-	configs={
+	configs={{
 		bounds: {
 			min: [-100, -100],
 			max: [100, 100],
@@ -52,19 +51,20 @@ Now, if we graph it, we get the following:
 			const dist = (ax, ay, bx, by) => Math.sqrt((ax - bx) ** 2 + (ay - by) ** 2)
 			return params.r - dist(vx, vy, params.x, params.y)
 		},
-	}
+	}}
 />
+```
 
 Now, notice how, when the function isn't normalized, it defines a gradient in which the sign indicates whether we are inside or outside the shape. You'll notice the undulating stripes in the visualization, those are the sine of the function output ($sin(z)$). They don't have a specific use in our case, but they do visually encode the gradient field, making it easier to see how the SDF changes smoothly across space.  
 The fact that the magnitude of `z` equals the distance to the closest surface is what makes them so useful for differentiable rendering, because the gradient magnitude is consistent everywhere, it never vanishes or explodes.  
 Obviously, we aren't limited to just circles, we can make basically any primitive, or make them intersect, unify, subtract, and so much more.  
 For instance:
 
-| Operation    | Function (>0 in, <0 out) | Function (<0 in, >0 out) |
-|--------------|--------------------------|--------------------------|
-| Union        | $max(a, b)$              | $min(a, b)$              |
-| Intersection | $min(a, b)$              | $max(a, b)$              |
-| Subtraction  | $min(a, -b)$             | $max(a, -b)$             |
+| Operation    | Function (>0 in, \<0 out) | Function (\<0 in, >0 out) |
+|--------------|---------------------------|---------------------------|
+| Union        | $max(a, b)$               | $min(a, b)$               |
+| Intersection | $min(a, b)$               | $max(a, b)$               |
+| Subtraction  | $min(a, -b)$              | $max(a, -b)$              |
 
 Where $a,b$ are two SDFs
 
@@ -789,7 +789,7 @@ For that I will use these images as optimization targets:
 <img alt="Image of my OC as the second optimization target" src="optim_target_gummi_art.png" height="200"/>
 
 Based on what we understand now, I put together the following script:
-<CodeEmbed language="python" source="optimizer_simple.py"/>
+\<CodeEmbed language="python" source="optimizer_simple.py"/>
 
 And well.. It does work..
 

@@ -3,6 +3,7 @@ import { ReactNode } from "react"
 
 import { TooltipProvider } from "@/components/ui/tooltip"
 
+import "katex/dist/katex.min.css"
 import "@/styles/theme.css"
 
 export const metadata: Metadata = {
