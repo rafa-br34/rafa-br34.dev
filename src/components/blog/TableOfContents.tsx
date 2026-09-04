@@ -16,7 +16,7 @@ function TocItem({ entry, activeId, depth = 0 }: { readonly entry: TocEntry; rea
 				className={cn(
 					"block py-0.5 text-sm transition-colors hover:text-theme-fg-0",
 					"border-l-2 border-transparent pl-2",
-					isActive && "border-theme-fg-1 text-theme-fg-0 font-medium",
+					isActive && "border-theme-fg-1 text-theme-fg-0 font-base",
 					!isActive && "text-theme-fg-2",
 				)}
 				style={{ paddingLeft: `${(depth + 1) * 0.5 + 0.25}rem` }}
@@ -70,7 +70,7 @@ export default function TableOfContents({ className, toc }: { readonly className
 	return (
 		<aside className={cn("sticky top-24 max-h-screen overflow-y-auto overflow-x-clip", className)}>
 			<h2 className="text-xs font-semibold uppercase tracking-wider text-theme-fg-3 mb-3">
-				On this page
+				Table of contents
 			</h2>
 			<nav>
 				<ul className="space-y-0">

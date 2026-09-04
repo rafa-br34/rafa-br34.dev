@@ -1,5 +1,6 @@
 import clsx from "clsx"
 import dayjs from "dayjs"
+import relativeTime from "dayjs/plugin/relativeTime"
 import Link from "next/link"
 
 import { POST_LIST } from "@/blog-posts"
@@ -8,7 +9,15 @@ import { BlogPost } from "@/lib/blog-post"
 import { Badge } from "@/components/ui/badge"
 import { GRAYSCALE_BACKDROP } from "@/lib/styles"
 
+dayjs.extend(relativeTime)
+
+function getPostDate(post: BlogPost) {
+	return dayjs(post.metadata.date)
+}
+
 function BlogListEntry({ post }: { readonly post: BlogPost }) {
+	const postDate = getPostDate(post)
+
 	return (
 		<Link
 			key={post.id}
@@ -20,9 +29,9 @@ function BlogListEntry({ post }: { readonly post: BlogPost }) {
 			</h2>
 			<time
 				className="text-sm text-theme-fg-2 mt-1 block"
-				dateTime={post.metadata.date}
+				dateTime={postDate.toISOString()}
 			>
-				{dayjs(post.metadata.date).format("YYYY-MM-DD HH:mm")}
+				{postDate.format("YYYY-MM-DD HH:mm")} ({postDate.fromNow()})
 			</time>
 			<p className="mt-2 text-theme-fg-1 text-sm leading-relaxed">
 				{post.metadata.desc}
@@ -46,7 +55,7 @@ export default function BlogListContent() {
 				? <p className="text-theme-fg-2">No posts yet. Check back soon!</p>
 				: (
 					<div className="grid gap-6">
-						{POST_LIST.map(post => <BlogListEntry post={post} key={post.id} />)}
+						{POST_LIST.toSorted((a, b) => getPostDate(b).diff(getPostDate(a))).map(post => <BlogListEntry post={post} key={post.id} />)}
 					</div>
 				)}
 		</div>

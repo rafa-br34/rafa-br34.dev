@@ -19,6 +19,7 @@ Now, by itself, differentiable rendering won't solve all problems depending on w
 SDFs play a huge part in 2D differentiable rendering (and I'd guess 3D DR too), so we first have to understand how they work.  
 In principle, SDFs are really simple: we just want to define a function that, given `x`, `y`, and whatever other parameters your primitive needs (e.g., `Px`, `Py`, `Pradius` for a circle) it returns a new `z` value.  
 If this `z` value is positive (>0) then we're inside the primitive, otherwise if it is negative (\<0) we're outside the primitive (hence the *signed* in the name).  
+
 > [!IMPORTANT]
 > Sign conventions change across the literature.  
 > What I will be using here (positive inside, negative outside) is perfectly valid. But most adopt the opposite (negative inside, positive outside).  
@@ -32,7 +33,7 @@ $D_{Circle}\left(v_{x},v_{y},p_{x},\ p_{y},p_{r}\right)=p_{r}-D\left(v_{x},\ v_{
 
 Where $v_x,v_y$ are our current grid position, $p_x,p_y$ are the position of our circle, and $p_r$ is the radius of our circle.  
 Here we are literally just measuring the distance (the $D$ function) to a point and adding a threshold ($p_r$) to make a circle.  
-Obviously, we can also negate the function (so that $z = -D_{Circle}(...)$) so that negative is inside the shape and positive is outside.  
+Obviously, we can also negate the function (which would be $z = -D_{Circle}(...)$) so that negative is inside the shape and positive is outside.  
 Now, if we graph it, we get the following:  
 
 ```
@@ -56,6 +57,7 @@ Now, if we graph it, we get the following:
 ```
 
 Now, notice how, when the function isn't normalized, it defines a gradient in which the sign indicates whether we are inside or outside the shape. You'll notice the undulating stripes in the visualization, those are the sine of the function output ($sin(z)$). They don't have a specific use in our case, but they do visually encode the gradient field, making it easier to see how the SDF changes smoothly across space.  
+Of course we will lose the full gradients when we squish the function by normalizing it, but the gradients will live within the slope of that normalization function.
 The fact that the magnitude of `z` equals the distance to the closest surface is what makes them so useful for differentiable rendering, because the gradient magnitude is consistent everywhere, it never vanishes or explodes.  
 Obviously, we aren't limited to just circles, we can make basically any primitive, or make them intersect, unify, subtract, and so much more.  
 For instance:

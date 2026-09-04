@@ -1,10 +1,11 @@
 import type { MDXComponents } from "mdx/types"
 import type { HTMLAttributes, ImgHTMLAttributes } from "react"
 
+import { Callout } from "@/components/blog/Callout"
 import { DemoGraph } from "@/components/blog/posts/DemoGraph"
 import { cn } from "./lib/utils"
 
-const HEADER_STYLING = "scroll-m-20 mt-6 first:mt-0 mb-2 font-semibold tracking-tight"
+const HEADER_STYLING = "mt-4 first:mt-0 mb-2 font-semibold tracking-tight"
 const BLOCKQUOTE_STYLING = "border-l-2 mt-2 border-fg-3 pl-6 italic text-fg-2 [&>*]:text-fg-3"
 
 export function useMDXComponents(components: MDXComponents): MDXComponents {
@@ -17,7 +18,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
 		h6: ({ className, children, ...props }) => <h6 className={cn(HEADER_STYLING, "text-base", className)} {...props}>{children}</h6>,
 
 		a: ({ className, ...props }) => <a className={cn("font-medium text-theme-fg-1 underline", className)} {...props} />,
-		p: ({ className, ...props }) => <p className={cn("leading-6 [&:not(:first-child)]:mt-2", className)} {...props} />,
+		p: ({ className, ...props }) => <p className={cn("leading-6 text-sm/6 [&:not(:first-child)]:mt-2", className)} {...props} />,
 
 		ul: ({ className, ...props }) => <ul className={cn("my-6 ml-6 list-disc", className)} {...props} />,
 		ol: ({ className, ...props }) => <ol className={cn("my-6 ml-6 list-decimal", className)} {...props} />,
@@ -82,5 +83,6 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
 
 		// 2026-07-02-first-blog-post
 		DemoGraph,
+		Callout,
 	}
 }
