@@ -1,9 +1,12 @@
 "use client"
 
 import type { Toc, TocEntry } from "@stefanprobst/rehype-extract-toc"
-import { useCallback, useEffect, useRef, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 
 import { cn } from "@/lib/utils"
+
+const HEADING_SELECTOR = "h1[id], h2[id], h3[id], h4[id], h5[id], h6[id]"
+const ACTIVE_LINE_OFFSET = 96
 
 function TocItem({ entry, activeId, depth = 0 }: { readonly entry: TocEntry; readonly activeId: string | null; readonly depth?: number }) {
 	const hasChildren = entry.children && entry.children.length > 0
@@ -32,43 +35,97 @@ function TocItem({ entry, activeId, depth = 0 }: { readonly entry: TocEntry; rea
 	)
 }
 
+function collectHeadingIds(entries: Toc): string[] {
+	return entries.flatMap(entry => [
+		...(entry.id != null ? [entry.id] : []),
+		...(entry.children != null ? collectHeadingIds(entry.children) : []),
+	])
+}
+
+function findScrollContainer(start: HTMLElement | null): HTMLElement | null {
+	let node = start?.parentElement ?? null
+
+	while (node) {
+		if (/(auto|scroll|overlay)/.test(getComputedStyle(node).overflowY)) {
+			return node
+		}
+
+		node = node.parentElement
+	}
+
+	return null
+}
+
 export default function TableOfContents({ className, toc }: { readonly className: string; readonly toc: Toc }) {
 	const [activeId, setActiveId] = useState<string | null>(null)
-	const observerRef = useRef<IntersectionObserver | null>(null)
 
-	const handleIntersection = useCallback((entries: IntersectionObserverEntry[]) => {
-		const visible = entries
-			.filter(entry => entry.isIntersecting)
-			.sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)
+	const asideRef = useRef<HTMLElement | null>(null)
+	const headingsRef = useRef<HTMLElement[]>([])
+	const lastActiveIdRef = useRef<string | null>(null)
+	const tickingRef = useRef(false)
+	const rafIdRef = useRef(0)
 
-		if (visible.length > 0) {
-			setActiveId(visible[0].target.id)
-		}
-	}, [])
+	const tocIds = useMemo(() => new Set(collectHeadingIds(toc)), [toc])
 
 	useEffect(() => {
-		observerRef.current = new IntersectionObserver(handleIntersection, {
-			rootMargin: "-80px 0px -80% 0px",
-			threshold: 0,
-		})
+		const container = findScrollContainer(asideRef.current)
 
-		const headingElements = document.querySelectorAll("h1[id], h2[id], h3[id], h4[id], h5[id], h6[id]")
-
-		for (const element of Array.from(headingElements)) {
-			observerRef.current.observe(element)
+		if (container == null || tocIds.size === 0) {
+			return
 		}
+
+		headingsRef.current = Array.from(document.querySelectorAll<HTMLElement>(HEADING_SELECTOR)).filter(heading => tocIds.has(heading.id))
+
+		const computeActive = () => {
+			// The active section is the last heading (in document order) whose top
+			// has scrolled past the reading line near the top of the container.
+			const activeLine = container.getBoundingClientRect().top + ACTIVE_LINE_OFFSET
+			let current: string | null = null
+
+			for (const heading of headingsRef.current) {
+				if (heading.getBoundingClientRect().top <= activeLine) {
+					current = heading.id
+				}
+			}
+
+			if (current !== lastActiveIdRef.current) {
+				lastActiveIdRef.current = current
+				setActiveId(current)
+			}
+		}
+
+		const scheduleCompute = () => {
+			if (tickingRef.current) {
+				return
+			}
+
+			tickingRef.current = true
+			rafIdRef.current = requestAnimationFrame(() => {
+				tickingRef.current = false
+				computeActive()
+			})
+		}
+
+		container.addEventListener("scroll", scheduleCompute, { passive: true })
+		window.addEventListener("resize", scheduleCompute)
+
+		computeActive()
 
 		return () => {
-			observerRef.current?.disconnect()
+			container.removeEventListener("scroll", scheduleCompute)
+			window.removeEventListener("resize", scheduleCompute)
+			cancelAnimationFrame(rafIdRef.current)
+			tickingRef.current = false
+			headingsRef.current = []
 		}
-	}, [handleIntersection])
+	}, [tocIds])
 
 	if (toc.length === 0) {
 		return null
 	}
 
 	return (
-		<aside className={cn("sticky top-24 max-h-screen overflow-y-auto overflow-x-clip", className)}>
+		<aside ref={asideRef} className={cn("sticky top-24 max-h-screen overflow-y-auto overflow-x-clip", className)}>
 			<h2 className="text-base font-semibold text-center tracking-wider text-theme-fg-3 mb-2">
 				Table of contents
 			</h2>
