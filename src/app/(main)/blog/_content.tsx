@@ -30,7 +30,7 @@ function BlogListEntry({ post }: { readonly post: BlogPost }) {
 
 			{post.metadata.tags.length > 0 && (
 				<div className="flex flex-wrap gap-1.5 mt-3">
-					{post.metadata.tags.map(tag => <Badge variant="secondary" key={tag}>{tag}</Badge>)}
+					{post.metadata.tags.toSorted((a, b) => a.localeCompare(b)).map(tag => <Badge variant="secondary" key={tag}>{tag}</Badge>)}
 				</div>
 			)}
 		</Link>
