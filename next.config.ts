@@ -34,8 +34,13 @@ function postAssetsBase(file: VFile): string | null {
 	return typeof id === "string" && id.trim() ? id.trim() : null
 }
 
-function rewriteAssetSource(src: string, base: string): string {
+function rewriteAssetSource(src: string | undefined, base: string): string {
+	if (!src) {
+		return src
+	}
+
 	let url = src.trim()
+
 	if (
 		!url
 		|| /^(?:(data:)|\/|#)/.test(url)
@@ -79,12 +84,15 @@ function rehypeBlogAssets() {
 				return
 			}
 
-			if (isElement(node) && node.tagName === "img") {
-				const { src } = node.properties
+			if (!isElement(node)) {
+				return
+			}
 
-				if (typeof src === "string") {
-					node.properties.src = rewriteAssetSource(src, base)
-				}
+			if (node.tagName === "img") {
+				node.properties.src = rewriteAssetSource(node.properties.src, base)
+			}
+			else if (node.tagName === "a") {
+				node.properties.href = rewriteAssetSource(node.properties.href, base)
 			}
 		})
 	}

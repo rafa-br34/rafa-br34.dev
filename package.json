@@ -17,6 +17,7 @@
 	"type": "commonjs",
 	"devDependencies": {
 		"@mdx-js/react": "^3.1.1",
+		"@shikijs/rehype": "^4.4.3",
 		"@tailwindcss/postcss": "^4.3.3",
 		"@types/hast": "^3.0.5",
 		"@types/node": "26.1.1",
@@ -29,6 +30,7 @@
 		"eslint-plugin-react-hooks": "^7.1.1",
 		"gh-pages": "^6.3.0",
 		"postcss": "^8.5.22",
+		"shiki": "^4.4.3",
 		"tailwindcss": "^4.3.0",
 		"tailwindcss-animate": "^1.0.7",
 		"tslib": "^2.8.1",
