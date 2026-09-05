@@ -2,6 +2,8 @@ import type { MDXComponents } from "mdx/types"
 import type { HTMLAttributes, ImgHTMLAttributes } from "react"
 
 import { Callout } from "@/components/blog/Callout"
+import CodeBlock from "@/components/blog/CodeBlock"
+import CodeEmbed from "@/components/blog/CodeEmbed"
 import { cn } from "./lib/utils"
 
 const HEADER_STYLING = "mt-3 first:mt-0 mb-2 font-semibold tracking-tight"
@@ -27,7 +29,9 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
 
 		blockquote: ({ className, ...props }) => <blockquote className={cn(BLOCKQUOTE_STYLING, className)} {...props} />,
 
-		img: ({ className, alt, ...props }: ImgHTMLAttributes<HTMLImageElement>) => <img className={cn("rounded-md border my-1", className)} alt={alt} {...props} />,
+		img: ({ className, alt, ...props }: ImgHTMLAttributes<HTMLImageElement>) => (
+			<img className={cn("rounded-md border border-theme-bg-2 my-1", className)} alt={alt} {...props} />
+		),
 
 		hr: ({ className, ...props }) => <hr className={cn("my-4 border md:my-8", className)} {...props} />,
 
@@ -61,15 +65,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
 			/>
 		),
 
-		pre: ({ className, ...props }) => (
-			<pre
-				className={cn(
-					"my-2 overflow-x-auto bg-theme-bg-0 rounded-md py-1 [&>code]:border-none [&>code]:p-auto",
-					className,
-				)}
-				{...props}
-			/>
-		),
+		pre: props => <CodeBlock {...props} />,
 		code: ({ className, ...props }) => (
 			<code
 				className={cn(
@@ -82,6 +78,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
 
 		// General
 		Callout,
+		CodeEmbed,
 
 		...components,
 		...BLOG_COMPONENT_LIST,

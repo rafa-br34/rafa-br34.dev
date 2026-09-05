@@ -2,6 +2,7 @@ import createMDX from "@next/mdx"
 import type { NextConfig } from "next"
 import path from "node:path"
 
+import rehypeShiki from "@shikijs/rehype"
 import withToc from "@stefanprobst/rehype-extract-toc"
 import withTocExport from "@stefanprobst/rehype-extract-toc/mdx"
 import type { Element, Root } from "hast"
@@ -13,6 +14,7 @@ import remarkFrontmatter from "remark-frontmatter"
 import remarkGfm from "remark-gfm"
 import remarkMath from "remark-math"
 import remarkMdxFrontmatter from "remark-mdx-frontmatter"
+import { bundledLanguagesInfo } from "shiki"
 import { visit } from "unist-util-visit"
 import type { VFile } from "vfile"
 
@@ -71,12 +73,19 @@ function rehypeBlogAssets() {
 		visit(tree, node => {
 			if (node.type === "mdxJsxFlowElement") {
 				const jsxElement = node as MdxJsxFlowElement
-				if (jsxElement.name !== "img" || !jsxElement.attributes) {
+
+				// `<img src>` and `<CodeEmbed source>` take a relative asset path.
+				if (jsxElement.name !== "img" && jsxElement.name !== "CodeEmbed") {
+					return
+				}
+				if (!jsxElement.attributes) {
 					return
 				}
 
+				const attributeName = jsxElement.name === "img" ? "src" : "source"
+
 				for (const attribute of jsxElement.attributes) {
-					if (attribute.type === "mdxJsxAttribute" && attribute.name === "src" && typeof attribute.value === "string") {
+					if (attribute.type === "mdxJsxAttribute" && attribute.name === attributeName && typeof attribute.value === "string") {
 						attribute.value = rewriteAssetSource(attribute.value, base)
 					}
 				}
@@ -172,6 +181,7 @@ const withMDX = createMDX({
 		rehypePlugins: [
 			rehypeSlug,
 			rehypeKatex,
+			[rehypeShiki, { theme: "dark-plus", addLanguageClass: true }],
 			rehypeCallouts,
 			rehypeBlogAssets,
 			withToc,
