@@ -9,6 +9,7 @@ import Link from "next/link"
 import type { BlogMetadata } from "@/lib/blog-post"
 import { GRAYSCALE_BACKDROP } from "@/lib/styles"
 
+import { DynamicTimestamp } from "@/components/DynamicTimestamp"
 import TableOfContents from "@/components/blog/TableOfContents"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
@@ -33,8 +34,6 @@ export default function BlogPostContent(
 		desc: postDesc,
 	} = metadata
 
-	const postDate = dayjs(postDateString)
-
 	return (
 		<article className={clsx(GRAYSCALE_BACKDROP, "container mx-auto h-full px-4 py-8 max-w-6xl")}>
 			<Link
@@ -53,12 +52,7 @@ export default function BlogPostContent(
 						<h1 className="text-3xl font-bold mb-2">{postTitle}</h1>
 						<p className="text-sm text-theme-fg-1 mb-2">{postDesc}</p>
 
-						<time
-							className="text-sm text-theme-fg-2"
-							dateTime={postDate.toISOString()}
-						>
-							{dayjs(postDate).format("YYYY-MM-DD HH:mm")} ({postDate.fromNow()})
-						</time>
+						<DynamicTimestamp dateString={postDateString} className="text-sm text-theme-fg-2" />
 
 						{postTags.length > 0 && (
 							<div className="flex flex-wrap gap-2 mt-3">

@@ -6,6 +6,7 @@ import Link from "next/link"
 import { POST_LIST } from "@/blog-posts"
 import { BlogPost } from "@/lib/blog-post"
 
+import { DynamicTimestamp } from "@/components/DynamicTimestamp"
 import { Badge } from "@/components/ui/badge"
 import { GRAYSCALE_BACKDROP } from "@/lib/styles"
 
@@ -16,7 +17,6 @@ function getPostDate(post: BlogPost) {
 }
 
 function BlogListEntry({ post }: { readonly post: BlogPost }) {
-	const postDate = getPostDate(post)
 	const thumbnail = post.metadata.thumbnail
 
 	return (
@@ -30,12 +30,7 @@ function BlogListEntry({ post }: { readonly post: BlogPost }) {
 					{post.metadata.title}
 				</h2>
 
-				<time
-					className="text-sm text-theme-fg-2 mt-1 block"
-					dateTime={postDate.toISOString()}
-				>
-					{postDate.format("YYYY-MM-DD HH:mm")} ({postDate.fromNow()})
-				</time>
+				<DynamicTimestamp dateString={post.metadata.date} className="text-sm text-theme-fg-2 mt-1 block" />
 
 				<p className="mt-2 text-theme-fg-1 text-sm leading-relaxed">
 					{post.metadata.desc}
