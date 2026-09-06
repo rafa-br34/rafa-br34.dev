@@ -11,8 +11,8 @@ import { cn } from "@/lib/utils"
 const pages = [
 	{ label: "Home", href: "/" },
 	{ label: "Gallery", href: "/gallery" },
-	{ label: "Projects", href: "/projects" },
 	{ label: "Blog", href: "/blog" },
+	{ label: "Projects", href: "/projects" },
 ]
 
 export function Navbar() {

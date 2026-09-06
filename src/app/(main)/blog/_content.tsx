@@ -17,31 +17,44 @@ function getPostDate(post: BlogPost) {
 
 function BlogListEntry({ post }: { readonly post: BlogPost }) {
 	const postDate = getPostDate(post)
+	const thumbnail = post.metadata.thumbnail
 
 	return (
 		<Link
 			key={post.id}
 			href={`/blog/${post.id}`}
-			className={clsx(GRAYSCALE_BACKDROP, "group block border border-theme-fg-3 rounded-lg p-5 hover:border-theme-fg-1 transition-colors")}
+			className={clsx(GRAYSCALE_BACKDROP, "h-50 group flex items-center gap-4 border border-theme-fg-3 rounded-lg p-3 hover:border-theme-fg-1 transition-colors")}
 		>
-			<h2 className="text-xl font-semibold group-hover:text-theme-fg-0 transition-colors">
-				{post.metadata.title}
-			</h2>
+			<div className="min-w-0 flex-1 h-full">
+				<h2 className="text-xl font-semibold group-hover:text-theme-fg-0 transition-colors">
+					{post.metadata.title}
+				</h2>
 
-			<time
-				className="text-sm text-theme-fg-2 mt-1 block"
-				dateTime={postDate.toISOString()}
-			>
-				{postDate.format("YYYY-MM-DD HH:mm")} ({postDate.fromNow()})
-			</time>
-			<p className="mt-2 text-theme-fg-1 text-sm leading-relaxed">
-				{post.metadata.desc}
-			</p>
+				<time
+					className="text-sm text-theme-fg-2 mt-1 block"
+					dateTime={postDate.toISOString()}
+				>
+					{postDate.format("YYYY-MM-DD HH:mm")} ({postDate.fromNow()})
+				</time>
 
-			{post.metadata.tags.length > 0 && (
-				<div className="flex flex-wrap gap-1.5 mt-3">
-					{post.metadata.tags.toSorted((a, b) => a.localeCompare(b)).map(tag => <Badge variant="secondary" key={tag}>{tag}</Badge>)}
-				</div>
+				<p className="mt-2 text-theme-fg-1 text-sm leading-relaxed">
+					{post.metadata.desc}
+				</p>
+
+				{post.metadata.tags.length > 0 && (
+					<div className="flex flex-wrap gap-1.5 mt-3">
+						{post.metadata.tags.toSorted((a, b) => a.localeCompare(b)).map(tag => <Badge variant="secondary" key={tag}>{tag}</Badge>)}
+					</div>
+				)}
+			</div>
+
+			{thumbnail != null && (
+				<img
+					src={`/assets/blogs/${post.id}/${thumbnail}`}
+					alt={`${post.metadata.title} thumbnail`}
+					className="h-full shrink-0 rounded-md border border-theme-bg-2 object-cover"
+					loading="lazy"
+				/>
 			)}
 		</Link>
 	)

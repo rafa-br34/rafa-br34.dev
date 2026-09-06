@@ -3,6 +3,7 @@
 import type { Toc } from "@stefanprobst/rehype-extract-toc"
 import clsx from "clsx"
 import dayjs from "dayjs"
+import relativeTime from "dayjs/plugin/relativeTime"
 import Link from "next/link"
 
 import type { BlogMetadata } from "@/lib/blog-post"
@@ -11,6 +12,8 @@ import { GRAYSCALE_BACKDROP } from "@/lib/styles"
 import TableOfContents from "@/components/blog/TableOfContents"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
+
+dayjs.extend(relativeTime)
 
 export default function BlogPostContent(
 	{
@@ -24,11 +27,13 @@ export default function BlogPostContent(
 	},
 ) {
 	const {
-		date: postDate,
+		date: postDateString,
 		tags: postTags,
 		title: postTitle,
 		desc: postDesc,
 	} = metadata
+
+	const postDate = dayjs(postDateString)
 
 	return (
 		<article className={clsx(GRAYSCALE_BACKDROP, "container mx-auto h-full px-4 py-8 max-w-6xl")}>
@@ -47,8 +52,12 @@ export default function BlogPostContent(
 					<header className="mb-4 border-b pb-4">
 						<h1 className="text-3xl font-bold mb-2">{postTitle}</h1>
 						<p className="text-sm text-theme-fg-1 mb-2">{postDesc}</p>
-						<time className="text-sm text-theme-fg-2" dateTime={postDate}>
-							{dayjs(postDate).format("YYYY-MM-DD HH:mm")}
+
+						<time
+							className="text-sm text-theme-fg-2"
+							dateTime={postDate.toISOString()}
+						>
+							{dayjs(postDate).format("YYYY-MM-DD HH:mm")} ({postDate.fromNow()})
 						</time>
 
 						{postTags.length > 0 && (
