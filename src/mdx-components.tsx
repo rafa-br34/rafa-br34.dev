@@ -3,7 +3,6 @@ import type { HTMLAttributes, ImgHTMLAttributes } from "react"
 
 import { Callout } from "@/components/blog/Callout"
 import CodeBlock from "@/components/blog/CodeBlock"
-import CodeEmbed from "@/components/blog/CodeEmbed"
 import { cn } from "./lib/utils"
 
 const HEADER_STYLING = "mt-3 first:mt-0 mb-2 font-semibold tracking-tight"
@@ -78,7 +77,6 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
 
 		// General
 		Callout,
-		CodeEmbed,
 
 		...components,
 		...BLOG_COMPONENT_LIST,

@@ -9,12 +9,13 @@ import type { Element, Root } from "hast"
 import { isElement } from "hast-util-is-element"
 import type { MdxJsxFlowElement } from "mdast-util-mdx-jsx"
 import rehypeKatex from "rehype-katex"
+import rehypeMdxCodeProps from "rehype-mdx-code-props"
 import rehypeSlug from "rehype-slug"
 import remarkFrontmatter from "remark-frontmatter"
 import remarkGfm from "remark-gfm"
 import remarkMath from "remark-math"
 import remarkMdxFrontmatter from "remark-mdx-frontmatter"
-import { bundledLanguagesInfo } from "shiki"
+import type { ShikiTransformer } from "shiki"
 import { visit } from "unist-util-visit"
 import type { VFile } from "vfile"
 
@@ -74,18 +75,16 @@ function rehypeBlogAssets() {
 			if (node.type === "mdxJsxFlowElement") {
 				const jsxElement = node as MdxJsxFlowElement
 
-				// `<img src>` and `<CodeEmbed source>` take a relative asset path.
-				if (jsxElement.name !== "img" && jsxElement.name !== "CodeEmbed") {
+				// `<img src>` takes a relative asset path.
+				if (jsxElement.name !== "img") {
 					return
 				}
 				if (!jsxElement.attributes) {
 					return
 				}
 
-				const attributeName = jsxElement.name === "img" ? "src" : "source"
-
 				for (const attribute of jsxElement.attributes) {
-					if (attribute.type === "mdxJsxAttribute" && attribute.name === attributeName && typeof attribute.value === "string") {
+					if (attribute.type === "mdxJsxAttribute" && attribute.name === "src" && typeof attribute.value === "string") {
 						attribute.value = rewriteAssetSource(attribute.value, base)
 					}
 				}
@@ -170,6 +169,23 @@ function rehypeCallouts() {
 	}
 }
 
+/**
+ * `@shikijs/rehype` rebuilds fenced code blocks from its own fragment and drops
+ * the mdast `code.data.meta` string that `rehypeMdxCodeProps` reads. Re-attach
+ * the raw meta from the transformer context so props written on the fence info
+ * string (e.g. ` ```py filename="example.py" `) survive until that plugin runs.
+ */
+const preserveCodeMetaTransformer: ShikiTransformer = {
+	name: "preserve-code-meta",
+	code(node) {
+		const raw = this.options.meta?.__raw
+		if (raw && !node.data?.meta) {
+			node.data = { ...node.data, meta: raw }
+		}
+		return node
+	},
+}
+
 const withMDX = createMDX({
 	options: {
 		remarkPlugins: [
@@ -181,11 +197,15 @@ const withMDX = createMDX({
 		rehypePlugins: [
 			rehypeSlug,
 			rehypeKatex,
-			[rehypeShiki, { theme: "dark-plus", addLanguageClass: true }],
+			[rehypeShiki, { theme: "dark-plus", addLanguageClass: true, transformers: [preserveCodeMetaTransformer] }],
 			rehypeCallouts,
 			rehypeBlogAssets,
 			withToc,
 			withTocExport,
+			// Turns fenced code meta into `<pre>` props, so `filename` etc. reach
+			// the mapped `CodeBlock` component. Converts hast into JSX nodes, so
+			// it must run last.
+			rehypeMdxCodeProps,
 		],
 	},
 })
@@ -193,6 +213,7 @@ const withMDX = createMDX({
 const nextConfig: NextConfig = {
 	output: "export",
 	distDir: "dist",
+	allowedDevOrigins: ["10.0.0.1"],
 
 	pageExtensions: ["ts", "tsx", "md", "mdx"],
 
