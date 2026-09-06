@@ -94,6 +94,7 @@ export function ParticleBackground(
 			animationId: number
 			computeKernel: ParticleLifeInterface
 			allocs: number[]
+			onResize: () => void
 		} | null
 	>(null)
 
@@ -121,6 +122,11 @@ export function ParticleBackground(
 
 		async function init() {
 			const computeKernel = await ParticleLifeLoader()
+
+			if (destroyed) {
+				return
+			}
+
 			const gl = canvas.getContext("webgl2", { premultipliedAlpha: true, alpha: true })
 
 			if (!gl) {
@@ -135,6 +141,10 @@ export function ParticleBackground(
 			])
 			const vertexSource = await shaderResp[0].text()
 			const fragmentSource = await shaderResp[1].text()
+
+			if (destroyed) {
+				return
+			}
 
 			const program = context.createProgram()
 			context.attachShader(program, createShader(context, vertexSource, context.VERTEX_SHADER))
@@ -293,7 +303,14 @@ export function ParticleBackground(
 				context.uniform1f(uRadius, particleSize)
 			}
 
-			window.addEventListener("resize", updateSize)
+			const onResize = () => {
+				if (destroyed) {
+					return
+				}
+				updateSize()
+			}
+
+			window.addEventListener("resize", onResize)
 			updateSize()
 
 			let lastFrame = performance.now()
@@ -361,7 +378,7 @@ export function ParticleBackground(
 				animationId = requestAnimationFrame(updateFrame)
 			}
 
-			stateRef.current = { animationId, computeKernel, allocs }
+			stateRef.current = { animationId, computeKernel, allocs, onResize }
 			animationId = requestAnimationFrame(updateFrame)
 		}
 
@@ -374,6 +391,10 @@ export function ParticleBackground(
 			canvas.removeEventListener("webglcontextrestored", onContextRestored)
 
 			const state = stateRef.current
+
+			if (state?.onResize) {
+				window.removeEventListener("resize", state.onResize)
+			}
 
 			if (state) {
 				for (const ptr of state.allocs) {

@@ -13,13 +13,12 @@ export function SDFInteractiveGraph() {
 			return
 		}
 
-		const camera = new THREE.PerspectiveCamera(75, canvas.width / canvas.height, 0.1, 100)
+		const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true })
+		renderer.setPixelRatio(window.devicePixelRatio)
+
+		const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 100)
 		camera.position.z = 5
 
-		const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: "low-power" })
-		renderer.setSize(canvas.width, canvas.height)
-
-		// const geometry = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0)
 		const geometry = new THREE.BoxGeometry(1, 1, 1)
 		const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 })
 		const cube = new THREE.Mesh(geometry, material)
@@ -28,13 +27,34 @@ export function SDFInteractiveGraph() {
 		scene.add(cube)
 
 		const controls = new OrbitControls(camera, canvas)
-		controls.addEventListener("change", renderer.render.bind(renderer, scene, camera))
-		controls.update()
-		renderer.render(scene, camera)
 
-		// renderer.setAnimationLoop(animate)
+		// Size the drawing buffer from the canvas' CSS box (scaled by
+		// devicePixelRatio) without letting three.js override the CSS layout size.
+		function resize() {
+			const { clientWidth, clientHeight } = canvas
+			if (clientWidth === 0 || clientHeight === 0) {
+				return
+			}
+			camera.aspect = clientWidth / clientHeight
+			camera.updateProjectionMatrix()
+			renderer.setSize(clientWidth, clientHeight, false)
+		}
+
+		resize()
+		const observer = new ResizeObserver(resize)
+		observer.observe(canvas)
+
+		function animate(time: number) {
+			cube.rotation.x = time / 2000
+			cube.rotation.y = time / 1000
+			controls.update()
+			renderer.render(scene, camera)
+		}
+
+		renderer.setAnimationLoop(animate)
 
 		return () => {
+			observer.disconnect()
 			renderer.setAnimationLoop(null)
 			controls.dispose()
 			geometry.dispose()
@@ -43,5 +63,5 @@ export function SDFInteractiveGraph() {
 		}
 	}, [])
 
-	return <canvas ref={canvasReference} width={400} height={400} className="w-80 h-80 min-w-0 min-h-0 rounded-md border border-theme-bg-2" />
+	return <canvas ref={canvasReference} className="h-40 w-40 min-h-0 min-w-0 rounded-md border border-theme-bg-2" />
 }
