@@ -308,7 +308,7 @@ export function ParticleBackground(
 				}
 
 				// @todo Find a better way than this
-				// Skip 1/4 frames when navigating (Check the monkey patch at the start of the file)
+				// Skip 1/2 frames when navigating (check the monkey patch at the start of the file)
 				if (navigating && frameSkip++ % 2 === 0) {
 					animationId = requestAnimationFrame(updateFrame)
 					return
@@ -330,7 +330,10 @@ export function ParticleBackground(
 					particleCount,
 					0.5,
 					scaleWorldSpace * 2,
-					0.9,
+					// Keep this considerably below 1
+					// Otherwise velocities can blow up to the thousands and cause the simulation to halt.
+					// (No idea why it halts, theoretically the particles should just go around pretty fast, but this fixes it so who cares.)
+					0.8,
 					2,
 					timeStep,
 					scalingX + particleSize,

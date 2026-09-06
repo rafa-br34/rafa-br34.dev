@@ -2,18 +2,24 @@
 
 import { useEffect, useRef } from "react"
 import * as THREE from "three"
+import { OrbitControls } from "three/addons/controls/OrbitControls.js"
 
 export function SDFInteractiveGraph() {
 	const canvasReference = useRef<HTMLCanvasElement>(null)
 
 	useEffect(() => {
 		const canvas = canvasReference.current
-		const camera = new THREE.PerspectiveCamera(75, canvas.width / canvas.height, 0.1, 1000)
+		if (!canvas) {
+			return
+		}
 
-		const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true })
+		const camera = new THREE.PerspectiveCamera(75, canvas.width / canvas.height, 0.1, 100)
+		camera.position.z = 5
+
+		const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: "low-power" })
 		renderer.setSize(canvas.width, canvas.height)
-		renderer.setAnimationLoop(animate)
 
+		// const geometry = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0)
 		const geometry = new THREE.BoxGeometry(1, 1, 1)
 		const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 })
 		const cube = new THREE.Mesh(geometry, material)
@@ -21,15 +27,21 @@ export function SDFInteractiveGraph() {
 		const scene = new THREE.Scene()
 		scene.add(cube)
 
-		camera.position.z = 5
+		const controls = new OrbitControls(camera, canvas)
+		controls.addEventListener("change", renderer.render.bind(renderer, scene, camera))
+		controls.update()
+		renderer.render(scene, camera)
 
-		function animate(time: number) {
-			cube.rotation.x = time / 2000
-			cube.rotation.y = time / 1000
+		// renderer.setAnimationLoop(animate)
 
-			renderer.render(scene, camera)
+		return () => {
+			renderer.setAnimationLoop(null)
+			controls.dispose()
+			geometry.dispose()
+			material.dispose()
+			renderer.dispose()
 		}
-	})
+	}, [])
 
-	return <canvas ref={canvasReference} width={200} height={200} className="w-40 h-40 min-w-0 min-h-0 rounded-md border border-theme-bg-2" />
+	return <canvas ref={canvasReference} width={400} height={400} className="w-80 h-80 min-w-0 min-h-0 rounded-md border border-theme-bg-2" />
 }
