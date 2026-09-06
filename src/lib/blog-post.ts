@@ -6,6 +6,7 @@ export type BlogMetadata = {
 	title: string
 	desc: string
 	date: string
+	edit: string
 	tags: string[]
 	id: string
 }

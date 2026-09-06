@@ -13,7 +13,15 @@ import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 
 export default function BlogPostContent(
-	{ children, metadata, toc }: { readonly children: React.ReactNode; readonly metadata: BlogMetadata; readonly toc: Toc },
+	{
+		children,
+		metadata,
+		toc,
+	}: {
+		readonly children: React.ReactNode
+		readonly metadata: BlogMetadata
+		readonly toc: Toc
+	},
 ) {
 	const {
 		date: postDate,

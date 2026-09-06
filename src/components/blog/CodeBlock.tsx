@@ -68,7 +68,7 @@ export default function CodeBlock({ children, className, style, filename, ...pro
 						</span>
 					)}
 					{language != null && (
-						<span className="block min-w-0 truncate text-base font-medium text-xs tracking-wider text-theme-fg-2">
+						<span className="ml-auto block min-w-0 truncate text-base font-medium text-xs tracking-wider text-theme-fg-2">
 							{languageDisplayName(language)}
 						</span>
 					)}

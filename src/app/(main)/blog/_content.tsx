@@ -27,6 +27,7 @@ function BlogListEntry({ post }: { readonly post: BlogPost }) {
 			<h2 className="text-xl font-semibold group-hover:text-theme-fg-0 transition-colors">
 				{post.metadata.title}
 			</h2>
+
 			<time
 				className="text-sm text-theme-fg-2 mt-1 block"
 				dateTime={postDate.toISOString()}

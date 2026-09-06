@@ -10,3 +10,6 @@ out/
 build/
 dist/
 next-env.d.ts
+
+# Agents
+.reasonix/

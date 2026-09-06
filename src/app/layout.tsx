@@ -3,6 +3,8 @@ import { ReactNode } from "react"
 
 import { TooltipProvider } from "@/components/ui/tooltip"
 
+import { WEBSITE_HOSTNAME, WEBSITE_URL } from "@/constants"
+
 import "katex/dist/katex.min.css"
 import "@/styles/theme.css"
 
@@ -12,10 +14,10 @@ export const metadata: Metadata = {
 		default: "rafa_br34 - About me and my projects",
 	},
 	description: "rafa_br34 is someone who codes C/C++, Python, TypeScript, a bit of Verilog/SystemVerilog and more.",
-	metadataBase: new URL("https://rafa-br34.dev"),
+	metadataBase: new URL(WEBSITE_URL),
 	openGraph: {
 		type: "profile",
-		siteName: "rafa_br34.dev",
+		siteName: WEBSITE_HOSTNAME,
 		locale: "en_US",
 		images: "/assets/artwork/gummi_arts_banner.png",
 	},
@@ -30,11 +32,11 @@ export const metadata: Metadata = {
 const LINKED_DATA = {
 	"@context": "https://schema.org",
 	"@type": "Person",
-	"email": "mailto:rafa_br34@exulan.com.au",
+	"email": "mailto:rafa_br34@exulan.com",
 	"givenName": "Rafael",
 	"name": "rafa_br34",
 	"alternateName": ["rafabr34", "rafa-br34"],
-	"url": "https://rafa-br34.dev",
+	"url": WEBSITE_URL,
 	"nationality": { "@type": "Country", "name": "Brazil" },
 	"gender": "Male",
 	"jobTitle": "Programmer, network engineer, and more",
@@ -51,7 +53,7 @@ const LINKED_DATA = {
 		"C++",
 	],
 	"description": "rafa_br34 is someone who codes C/C++, Python, TypeScript, a bit of Verilog/SystemVerilog and more. Also a fluffy feral dragon!",
-	"image": "https://rafa-br34.dev/assets/artwork/o_pastelzera_portrait.png",
+	"image": `${WEBSITE_URL}/assets/artwork/o_pastelzera_portrait.png`,
 	"sameAs": [
 		"https://github.com/rafa-br34",
 		"https://github.com/rafabr34",
