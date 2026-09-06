@@ -7,8 +7,8 @@ import { cn } from "@/lib/utils"
 
 import { CodeFrame } from "../codeblocks/CodeFrame"
 import { CodeSource } from "../codeblocks/CodeSource"
+import CopyButton from "../codeblocks/CopyButton"
 import { extractLanguageClass } from "../codeblocks/codeLanguage"
-import CopyButton from "./CopyButton"
 
 function findFenceLanguage(children: ReactNode): string | null {
 	if (children == null) {
@@ -40,7 +40,7 @@ export default function CodeBlock({ children, className, style, ...props }: Read
 					{language}
 				</span>
 			)}
-			actions={<CopyButton getText={copyCode} label="Copy code" />}
+			actions={<CopyButton getText={copyCode} />}
 		>
 			<CodeSource reference={preRef} className={className} style={style} {...props}>
 				{children}

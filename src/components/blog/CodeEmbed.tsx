@@ -5,7 +5,7 @@ import type { ReactNode } from "react"
 import { useRef } from "react"
 
 import { CodeFrame } from "../codeblocks/CodeFrame"
-import CopyButton from "./CopyButton"
+import CopyButton from "../codeblocks/CopyButton"
 
 function sourceFileName(source: string): string {
 	const lastSlash = source.lastIndexOf("/")
@@ -70,10 +70,10 @@ export default function CodeEmbed(
 							aria-label={`Download ${fileName}`}
 							className="inline-flex shrink-0 items-center gap-1 rounded-md border border-theme-bg-3 px-1.5 py-0.5 text-theme-fg-2 transition-colors hover:text-theme-fg-0"
 						>
-							<Download size={12} aria-hidden="true" />
+							<Download size={16} aria-hidden="true" />
 						</a>
 					)}
-					<CopyButton getText={copyCode} label="Copy file" />
+					<CopyButton getText={copyCode} />
 				</>
 			}
 		>
