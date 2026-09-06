@@ -179,9 +179,11 @@ const preserveCodeMetaTransformer: ShikiTransformer = {
 	name: "preserve-code-meta",
 	code(node) {
 		const raw = this.options.meta?.__raw
+
 		if (raw && !node.data?.meta) {
 			node.data = { ...node.data, meta: raw }
 		}
+
 		return node
 	},
 }
@@ -202,9 +204,9 @@ const withMDX = createMDX({
 			rehypeBlogAssets,
 			withToc,
 			withTocExport,
-			// Turns fenced code meta into `<pre>` props, so `filename` etc. reach
-			// the mapped `CodeBlock` component. Converts hast into JSX nodes, so
-			// it must run last.
+			// Turns fenced code meta into `<pre>` props, so `filename` etc.
+			// reach the mapped `CodeBlock` component. Converts hast into JSX nodes.
+			// Must run last.
 			rehypeMdxCodeProps,
 		],
 	},
@@ -213,7 +215,6 @@ const withMDX = createMDX({
 const nextConfig: NextConfig = {
 	output: "export",
 	distDir: "dist",
-	allowedDevOrigins: ["10.0.0.1"],
 
 	pageExtensions: ["ts", "tsx", "md", "mdx"],
 

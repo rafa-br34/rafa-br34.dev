@@ -8,7 +8,7 @@ import { cn } from "./lib/utils"
 const HEADER_STYLING = "mt-3 first:mt-0 mb-2 font-semibold tracking-tight"
 const BLOCKQUOTE_STYLING = "border-l-2 mt-2 border-fg-3 pl-6 italic text-fg-2 [&>*]:text-fg-3"
 
-import { BLOG_COMPONENT_LIST } from "./components/blog/_ComponentList"
+import { BLOG_COMPONENT_LIST } from "./components/blog/posts/_Components"
 
 export function useMDXComponents(components: MDXComponents): MDXComponents {
 	return {

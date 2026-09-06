@@ -4,7 +4,7 @@ desc: Going in-depth how 2D differentiable rendering/rasterization works and rei
 date: 2026-08-16T16:40-03:00
 edit: 2026-09-05T23:26-03:00
 tags: ["ai/ml", "rasterization", "gradients"]
-thumbnail: out-optim_target_o_pastelzera_headshot.png-norm_sigmoid-1788407794-animated.webp
+thumbnail: out-optim_target_o_pastelzera_headshot.png-norm_sigmoid-1788407794-animated-no-bar.webp
 id: "2026-08-16-differentiable-rendering"
 ---
 
@@ -37,6 +37,7 @@ Here we are literally just measuring the distance (the $D$ function) to a point 
 Obviously, we can also negate the function (which would be $z = -D_{Circle}(...)$) so that negative is inside the shape and positive is outside.  
 Now, if we graph it, we get the following:  
 
+<SDFInteractiveGraph/>
 ```
 <SDFInteractiveGraph
 	configs={{
