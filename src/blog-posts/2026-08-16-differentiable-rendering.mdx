@@ -58,7 +58,9 @@ Now, if we graph it, we get the following:
 />
 ```
 
-Now, notice how, when the function isn't normalized, it defines a gradient in which the sign indicates whether we are inside or outside the shape. You'll notice the undulating stripes in the visualization, those are the sine of the function output ($sin(z)$). They don't have a specific use in our case, but they do visually encode the gradient field, making it easier to see how the SDF changes smoothly across space.  
+Now, notice how, when the function isn't normalized, it defines a gradient in which the sign indicates whether we are inside or outside the shape.
+You'll also notice the undulating stripes in the visualization, those are the sine of the function output ($sin(z)$).
+They don't have a specific use in our case, but they do visually encode the gradient field, making it easier to see how the SDF changes smoothly across space.  
 Of course we will lose the full gradients when we squish the function by normalizing it, but the gradients will live within the slope of that normalization function.
 The fact that the magnitude of `z` equals the distance to the closest surface is what makes them so useful for differentiable rendering, because the gradient magnitude is consistent everywhere, it never vanishes or explodes.  
 Obviously, we aren't limited to just circles, we can make basically any primitive, or make them intersect, unify, subtract, and so much more.  

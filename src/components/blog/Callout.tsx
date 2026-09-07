@@ -1,4 +1,4 @@
-import { CircleAlert, Info, Lightbulb, type LucideProps, OctagonAlert, TriangleAlert } from "lucide-react"
+import { AlertCircle, BookMarked, CircleAlert, Info, Lightbulb, type LucideProps, MessageSquareWarning, OctagonAlert, TriangleAlert } from "lucide-react"
 import type { ComponentType, ReactNode } from "react"
 
 import { cn } from "@/lib/utils"
@@ -14,7 +14,7 @@ type CalloutDescriptor = {
 
 const CALLOUT_STYLES: Record<CalloutType, CalloutDescriptor> = {
 	note: {
-		iconType: Info,
+		iconType: BookMarked,
 		iconTitle: "Note",
 		iconColor: "text-theme-c-1",
 		iconBorder: "border-theme-c-1",
@@ -26,7 +26,7 @@ const CALLOUT_STYLES: Record<CalloutType, CalloutDescriptor> = {
 		iconBorder: "border-theme-g-1",
 	},
 	important: {
-		iconType: CircleAlert,
+		iconType: MessageSquareWarning,
 		iconTitle: "Important",
 		iconColor: "text-theme-m-1",
 		iconBorder: "border-theme-m-1",
@@ -54,7 +54,7 @@ export function Callout({
 	readonly className?: string
 	readonly children?: ReactNode
 }) {
-	const calloutStyle = CALLOUT_STYLES[type.toLowerCase() as CalloutType] ?? CALLOUT_STYLES.note
+	const calloutStyle = CALLOUT_STYLES[type.toLowerCase() as CalloutType]
 
 	const {
 		iconType: Icon,

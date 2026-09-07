@@ -360,7 +360,7 @@ export function ParticleBackground(
 				average.push(kernelTime)
 
 				if (average.length >= 30) {
-					console.log(average.reduce((a, b) => a + b, 0) / average.length)
+					// console.log(average.reduce((a, b) => a + b, 0) / average.length)
 					average.length = 0
 				}
 
