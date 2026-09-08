@@ -9,6 +9,7 @@ import { WebGLNodesHandler } from "three/examples/jsm/tsl/WebGLNodesHandler.js"
 import {
 	abs,
 	clamp,
+	exp,
 	float,
 	Fn,
 	fract,
@@ -16,9 +17,11 @@ import {
 	max,
 	min,
 	mix,
+	negate,
 	normalize,
 	positionLocal,
 	screenCoordinate,
+	select,
 	smoothstep,
 	step,
 	texture,
@@ -213,6 +216,7 @@ function buildFieldMaterial(primitive: SdfPrimitive) {
 		void main() {
 			vec2 p = uCenter + vec2(v_uv.x - 0.5, 0.5 - v_uv.y) * (2.0 * uExtent);
 			float d = sdfShape(p);
+
 			gl_FragColor = vec4(vec3(d), 1.0);
 		}
 	`
@@ -279,12 +283,10 @@ function renderView(
 	sy: number,
 	scene: THREE.Scene,
 	cam: THREE.Camera,
-	color: THREE.Color,
 ) {
 	renderer.setViewport(x, y, sx, sy)
 	renderer.setScissor(x, y, sx, sy)
 	renderer.setScissorTest(true)
-	renderer.setClearColor(color, 1)
 	renderer.render(scene, cam)
 }
 
@@ -292,36 +294,38 @@ function renderView(
 // TSL shaders
 //
 
-type FieldSampler = (uv: Node<"vec2">) => Node<"float">
-
-function createFieldSampler(fieldTexture: THREE.Texture): FieldSampler {
+function createFieldSampler(fieldTexture: THREE.Texture) {
 	const fieldTextureNode = texture(fieldTexture)
 
-	return point => fieldTextureNode.sample(clamp(point, 0.0, 1.0)).x
+	return (point: Node<"vec2">) => fieldTextureNode.sample(clamp(point, 0.0, 1.0)).x
 }
 
-const sdfPalette = Fn(([v]: [Node<"float">]) => {
-	const cold = mix(vec3(0.08, 0.18, 0.75), vec3(0.94, 0.97, 1.00), smoothstep(-1.5, 0.0, v))
-	const warm = mix(vec3(0.98, 0.95, 0.88), vec3(0.80, 0.14, 0.05), smoothstep(0.0, 1.5, v))
-	return mix(cold, warm, step(0.0, v))
+const sdfColor = Fn(([value]: [Node<"float">]) => {
+	const mul = select(value.greaterThan(0), vec3(1, 0, 0), vec3(0, 0, 1))
+	const col = select(value.greaterThan(0), vec3(0, 1, 1), vec3(1, 1, 0))
+
+	const valAbs = abs(value)
+
+	// col *= 1.0 - exp(-6.0 * abs(d));
+	let newCol = col.mul(float(1).sub(exp(float(-6).mul(valAbs))))
+	// col *= 0.8 + 0.2 * cos(50.0 * d);
+	newCol = newCol.mul(float(0.8).add(float(0.2).mul(value.mul(50).cos())))
+	// col += mul * abs(d);
+	newCol = newCol.add(mul.mul(valAbs).mul(0.1))
+	// col = mix(col, vec3(1.0), 1.0 - smoothstep(0.0, 0.01, abs(d)));
+	newCol = mix(newCol, vec3(1), float(1).sub(smoothstep(0, 0.01, valAbs)))
+
+	return newCol
 })
 
-interface GraphShaderOptions {
+// Displaces a flat grid by the sampled field and shades it by SDF value + slope.
+function createGraphShader(options: {
 	readonly fieldTexture: THREE.Texture
 	readonly fieldSizeX: number
 	readonly fieldSizeY: number
 	readonly initialRelief: number
 	readonly initialWindowExtent: number
-}
-
-interface GraphShader {
-	readonly material: MeshBasicNodeMaterial
-	setRelief(relief: number): void
-	setWindowExtent(windowExtent: number): void
-}
-
-// Displaces a flat grid by the sampled field and shades it by SDF value + slope.
-function createGraphShader(options: GraphShaderOptions): GraphShader {
+}) {
 	const sample = createFieldSampler(options.fieldTexture)
 	const texelX = 1 / options.fieldSizeX
 	const texelY = 1 / options.fieldSizeY
@@ -333,8 +337,7 @@ function createGraphShader(options: GraphShaderOptions): GraphShader {
 	const material = new MeshBasicNodeMaterial({ side: THREE.DoubleSide })
 
 	// displace each vertex along +Y by the sampled field value
-	material.positionNode = positionLocal.add(vec3(0.0, sample(uv()).mul(reliefNode), 0.0))
-
+	material.positionNode = positionLocal.add(vec3(0.0, negate(sample(uv()).mul(reliefNode)), 0.0))
 	{
 		const u = uv()
 		const d0 = sample(u)
@@ -344,15 +347,15 @@ function createGraphShader(options: GraphShaderOptions): GraphShader {
 		const dU = sample(vec2(u.x, u.y.add(texelY)))
 
 		// analytic normal from buffer neighbours
-		const nrm = normalize(vec3(
+		const normal = normalize(vec3(
 			reliefNode.mul(dL.sub(dR)).mul(options.fieldSizeX),
 			slopeScaleNode,
 			reliefNode.mul(dU.sub(dD)).mul(options.fieldSizeY),
 		))
-		const lam = max(nrm.dot(sunDirection), 0.0)
+		const lam = max(normal.dot(sunDirection), 0.0)
 
-		let col = sdfPalette(d0)
-		col = col.mul(lam.mul(0.55).add(0.45))
+		let col = sdfColor(d0)
+		col = col.mul(lam.mul(0.8).add(0.45))
 
 		// crisp white band at the zero iso-line
 		const zeroBand = float(1.0).sub(smoothstep(0.0, 0.04, abs(d0)))
@@ -363,32 +366,23 @@ function createGraphShader(options: GraphShaderOptions): GraphShader {
 
 	return {
 		material,
-		setRelief: relief => {
+		setRelief: (relief: number) => {
 			reliefNode.value = relief
 		},
-		setWindowExtent: windowExtent => {
+		setWindowExtent: (windowExtent: number) => {
 			slopeScaleNode.value = 4 * windowExtent
 		},
 	}
 }
 
-interface ImageShaderOptions {
-	readonly fieldTexture: THREE.Texture
-}
-
-interface ImageShader {
-	readonly material: MeshBasicNodeMaterial
-	setViewport(x: number, y: number, sx: number, sy: number): void
-}
-
 // Flat 2D preview of the same field, rendered into the right half of the canvas.
-function createFieldImageShader(options: ImageShaderOptions): ImageShader {
+function createFieldImageShader(options: { readonly fieldTexture: THREE.Texture }) {
 	const sample = createFieldSampler(options.fieldTexture)
 
 	const uViewPos = uniform(new THREE.Vector2(0, 0)) // right viewport origin (device px)
 	const uViewSize = uniform(new THREE.Vector2(1, 1)) // right viewport size (device px)
 
-	const material = new MeshBasicNodeMaterial({ depthTest: false, depthWrite: false })
+	const material = new MeshBasicNodeMaterial({ depthTest: false, depthWrite: false, transparent: true })
 
 	{
 		const px = screenCoordinate
@@ -404,7 +398,7 @@ function createFieldImageShader(options: ImageShaderOptions): ImageShader {
 		const d = sample(mapUv)
 
 		// SDF palette + iso contours (every 0.5 world units)
-		let col = sdfPalette(d)
+		let col = sdfColor(d)
 		const distanceBand = d.abs()
 		const bandInner = min(fract(distanceBand.mul(2.0)), float(1.0).sub(fract(distanceBand.mul(2.0))))
 		const bandWidth = max(fwidth(distanceBand).mul(2.0), 0.002)
@@ -415,15 +409,12 @@ function createFieldImageShader(options: ImageShaderOptions): ImageShader {
 		const zeroBand = float(1.0).sub(smoothstep(0.0, 0.05, abs(d)))
 		col = mix(col, vec3(1.0), zeroBand.mul(0.9))
 
-		// dark backdrop outside the field square
-		col = mix(vec3(0.03, 0.035, 0.05), col, inside)
-
-		material.outputNode = vec4(col, 1.0)
+		material.outputNode = vec4(col, mix(0, 1, inside))
 	}
 
 	return {
 		material,
-		setViewport: (x, y, sx, sy) => {
+		setViewport: (x: number, y: number, sx: number, sy: number) => {
 			uViewPos.value.set(x, y)
 			uViewSize.value.set(sx, sy)
 		},
@@ -601,9 +592,9 @@ export function SDFInteractiveGraph() {
 		unitGeo.rotateX(-Math.PI / 2)
 
 		const planeMat = new THREE.MeshBasicMaterial({
-			color: 0x333333,
+			color: 0xFFFFFF,
 			transparent: true,
-			opacity: 0.15,
+			opacity: 0.25,
 			side: THREE.DoubleSide,
 			depthWrite: false,
 		})
@@ -681,8 +672,6 @@ export function SDFInteractiveGraph() {
 		//
 		// Render loop
 		//
-		const skyColor = new THREE.Color(0.30, 0.30, 0.30)
-		const darkColor = new THREE.Color(0.03, 0.035, 0.05)
 		const tmpDirection = new THREE.Vector3()
 
 		let animationFrame = 0
@@ -759,17 +748,17 @@ export function SDFInteractiveGraph() {
 			updateFieldUniforms()
 			updateCamera()
 
-			// the ONE SDF sampling pass -> shared field target
+			// Sampling pass
 			renderer.setRenderTarget(fieldTarget)
 			renderer.render(fieldScene, imageCamera)
 			renderer.setRenderTarget(null)
 
-			// left viewport: 3D graph
-			renderView(renderer, 0, 0, leftWidth, deviceHeight, graphScene, meshCamera, skyColor)
+			// Left viewport: 3D graph
+			renderView(renderer, 0, 0, leftWidth, deviceHeight, graphScene, meshCamera)
 
-			// right viewport: 2D field image
+			// Right viewport: 2D field image
 			imageShader.setViewport(leftWidth, 0, rightWidth, deviceHeight)
-			renderView(renderer, leftWidth, 0, rightWidth, deviceHeight, imageScene, imageCamera, darkColor)
+			renderView(renderer, leftWidth, 0, rightWidth, deviceHeight, imageScene, imageCamera)
 
 			renderer.setScissorTest(false)
 			renderer.setViewport(0, 0, deviceWidth, deviceHeight)
@@ -810,8 +799,8 @@ export function SDFInteractiveGraph() {
 
 	return (
 		<div className="grid grid-cols-1 gap-2 bg-clip-content rounded-md border border-theme-bg-2">
-			<div className="relative h-120 min-h-0 min-w-0 w-full border-b border-theme-bg-2 overflow-hidden">
-				<canvas ref={canvasRef} className="absolute inset-0 h-full w-full rounded-md" />
+			<div className="relative h-120 min-h-0 min-w-0 w-full overflow-hidden rounded-t-md border-b border-theme-bg-2">
+				<canvas ref={canvasRef} className="absolute inset-0 h-full w-full rounded-t-sm" />
 				<div
 					ref={overlayRef}
 					className="absolute inset-y-0 right-0 w-1/2 cursor-grab touch-none"
