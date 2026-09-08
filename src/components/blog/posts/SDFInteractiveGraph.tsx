@@ -332,7 +332,11 @@ function createGraphShader(options: {
 
 	const reliefNode = uniform(options.initialRelief)
 	const slopeScaleNode = uniform(4 * options.initialWindowExtent)
-	const sunDirection = vec3(0.45, 0.85, 0.30)
+	// A normalized, fairly low sun. The old direction pointed almost straight up
+	// (and wasn't normalized), so lam was ~0.85 on every face and the multiply
+	// below usually exceeded 1 and clipped — i.e. no visible shading. A grazing
+	// sun makes faces at different tilts shade differently.
+	const sunDirection = normalize(vec3(0.55, 0.62, 0.5))
 
 	const material = new MeshBasicNodeMaterial({ side: THREE.DoubleSide })
 
@@ -346,16 +350,20 @@ function createGraphShader(options: {
 		const dD = sample(vec2(u.x, u.y.sub(texelY)))
 		const dU = sample(vec2(u.x, u.y.add(texelY)))
 
-		// analytic normal from buffer neighbours
+		// analytic normal from buffer neighbors; x/z slope is exaggerated a
+		// little so the shading reads as 3D even at modest relief values
+		const normalStrength = 1.6
 		const normal = normalize(vec3(
-			reliefNode.mul(dL.sub(dR)).mul(options.fieldSizeX),
+			reliefNode.mul(dL.sub(dR)).mul(options.fieldSizeX).mul(normalStrength),
 			slopeScaleNode,
-			reliefNode.mul(dU.sub(dD)).mul(options.fieldSizeY),
+			reliefNode.mul(dU.sub(dD)).mul(options.fieldSizeY).mul(normalStrength),
 		))
 		const lam = max(normal.dot(sunDirection), 0.0)
 
 		let col = sdfColor(d0)
-		col = col.mul(lam.mul(0.8).add(0.45))
+		// ambient + diffuse: keep the brightest faces at ~1.0 instead of
+		// clipping, so lit vs shadowed slopes actually separate
+		col = col.mul(lam.mul(0.62).add(0.38))
 
 		// crisp white band at the zero iso-line
 		const zeroBand = float(1.0).sub(smoothstep(0.0, 0.04, abs(d0)))
@@ -481,8 +489,6 @@ export function SDFInteractiveGraph() {
 		settingsRef.current = settings
 	}, [settings])
 
-	const [center, setCenter] = useState({ x: 0, z: 0 })
-
 	function updateSettings(patch: Partial<Pick<SdfSettings, "mode" | "relief" | "extent">>) {
 		setSettings(prev => ({ ...prev, ...patch }))
 	}
@@ -498,12 +504,6 @@ export function SDFInteractiveGraph() {
 				},
 			},
 		}))
-	}
-
-	function syncCenterLabel() {
-		if (mountedRef.current) {
-			setCenter({ x: viewCenterRef.current.x, z: viewCenterRef.current.z })
-		}
 	}
 
 	function hookMeshCamera(meshCanvas: HTMLCanvasElement) {
@@ -522,7 +522,6 @@ export function SDFInteractiveGraph() {
 			viewCenterRef.current.x = meshControls.target.x
 			viewCenterRef.current.z = meshControls.target.z
 		})
-		meshControls.addEventListener("end", syncCenterLabel)
 
 		return {
 			meshCamera,
@@ -658,8 +657,8 @@ export function SDFInteractiveGraph() {
 			if (overlay.hasPointerCapture(event.pointerId)) {
 				overlay.releasePointerCapture(event.pointerId)
 			}
+
 			overlay.style.cursor = "grab"
-			syncCenterLabel()
 		}
 
 		overlay.style.cursor = "grab"
@@ -791,14 +790,13 @@ export function SDFInteractiveGraph() {
 
 			mountedRef.current = false
 		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
 	const activePrimitive = SDF_PRIMITIVES[settings.mode]
 	const activeParams = settings.params[activePrimitive.id]
 
 	return (
-		<div className="grid grid-cols-1 gap-2 bg-clip-content rounded-md border border-theme-bg-2">
+		<div className="grid grid-cols-1 gap-2 bg-clip-content rounded-md border border-theme-bg-2 bg-theme-bg-0">
 			<div className="relative h-120 min-h-0 min-w-0 w-full overflow-hidden rounded-t-md border-b border-theme-bg-2">
 				<canvas ref={canvasRef} className="absolute inset-0 h-full w-full rounded-t-sm" />
 				<div
@@ -870,19 +868,6 @@ export function SDFInteractiveGraph() {
 								onChange={value => updateSettings({ extent: value })}
 							/>
 						</div>
-					</div>
-				</div>
-
-				<div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-3 border-t border-theme-bg-2 pt-3">
-					<div className="rounded border border-theme-bg-2 p-2 text-[11px] leading-4">
-						<div className="font-semibold">Center</div>
-						<div>x: {center.x.toFixed(2)}</div>
-						<div>z: {center.z.toFixed(2)}</div>
-					</div>
-					<div className="text-[11px] leading-4 text-theme-fg-3">
-						Left: drag = orbit, right-drag = pan
-						<br />
-						Right: drag = pan, wheel = zoom
 					</div>
 				</div>
 			</div>
