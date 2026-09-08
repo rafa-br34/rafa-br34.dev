@@ -29,7 +29,16 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
 		blockquote: ({ className, ...props }) => <blockquote className={cn(BLOCKQUOTE_STYLING, className)} {...props} />,
 
 		img: ({ className, alt, ...props }: ImgHTMLAttributes<HTMLImageElement>) => (
-			<img className={cn("rounded-md border border-theme-bg-2 my-1", className)} alt={alt} {...props} />
+			<img
+				// Never block first paint/hydration on image decode.
+				// Instead, mark all decode work async and only fetch images once they scroll near the viewport.
+				// Per-image attributes (e.g. an explicit `loading="eager"` in MDX) win because they spread last.
+				loading="lazy"
+				decoding="async"
+				className={cn("rounded-md border border-theme-bg-2 my-1", className)}
+				alt={alt}
+				{...props}
+			/>
 		),
 
 		hr: ({ className, ...props }) => <hr className={cn("my-4 border md:my-8", className)} {...props} />,

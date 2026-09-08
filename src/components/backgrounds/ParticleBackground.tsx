@@ -6,7 +6,12 @@ import { cn } from "@/lib/utils"
 
 import { type ParticleLifeInterface, ParticleLifeLoader } from "@/lib/kernels/particle_life_compute"
 
-// @todo This entire file is a mess, revisit later.
+// While a route change is in progress the animation loop sheds every other
+// frame (it keeps running, just at half cadence). The particle kernel runs on
+// the main thread, so this frees up a meaningful slice of it for React to mount
+// the next page on Chromium, where this otherwise turns into multi-second
+// freezes. Firefox is far less sensitive, which is why the bug only shows up in
+// Chromium-based browsers.
 let navigating = false
 let navigatingTimeout = 0
 
@@ -17,16 +22,23 @@ function setNavigating() {
 		() => {
 			navigating = false
 		},
-		500,
+		800,
 	) as unknown as number
 }
 
-declare global {
-	var pushStatePatched: boolean | undefined
-	var replaceStatePatched: boolean | undefined
+function isDifferentRoute(href: string): boolean {
+	let path = href
+
+	if (path.startsWith(globalThis.location.origin)) {
+		path = path.slice(globalThis.location.origin.length)
+	}
+
+	return path.split(/[?#]/)[0] !== globalThis.location.pathname
 }
 
-// Catch internal link clicks before Next.js starts navigation work.
+// Catch internal link clicks before Next.js starts navigation work, plus
+// browser back/forward (which has no click to listen to). Clicks on links to
+// the current route don't navigate, so they are ignored.
 if (typeof document !== "undefined") {
 	document.addEventListener(
 		"click",
@@ -34,13 +46,14 @@ if (typeof document !== "undefined") {
 			const link = (event.target as Element).closest("a[href]")
 			if (link) {
 				const href = link.getAttribute("href")
-				if (href && (href.startsWith("/") || href.startsWith(globalThis.location.origin))) {
+				if (href && (href.startsWith("/") || href.startsWith(globalThis.location.origin)) && isDifferentRoute(href)) {
 					setNavigating()
 				}
 			}
 		},
 		{ capture: true },
 	)
+	document.addEventListener("popstate", setNavigating)
 }
 
 function createShader(context: WebGL2RenderingContext, source: string, type: GLenum) {
@@ -319,14 +332,27 @@ export function ParticleBackground(
 
 			const average: number[] = []
 
+			// A simulation step slower than this drops the very next frame,
+			// capping how much of the main thread this decorative loop can claim
+			// on slow machines / busy tabs. Normal hardware never reaches it.
+			const expensiveStepMs = 8
+			let shedExpensiveStep = false
+
 			function updateFrame(currFrame: number = 0) {
 				if (destroyed || contextLost) {
 					return
 				}
 
-				// @todo Find a better way than this
-				// Skip 1/2 frames when navigating (check the monkey patch at the start of the file)
+				// Skip 1/2 frames while navigating, so React mounting the next
+				// page gets a quieter main thread on Chromium.
 				if (navigating && frameSkip++ % 2 === 0) {
+					animationId = requestAnimationFrame(updateFrame)
+					return
+				}
+
+				// An expensive step sheds the very next frame as well.
+				if (shedExpensiveStep) {
+					shedExpensiveStep = false
 					animationId = requestAnimationFrame(updateFrame)
 					return
 				}
@@ -357,6 +383,7 @@ export function ParticleBackground(
 					scalingY + particleSize,
 				)
 				const kernelTime = performance.now() - kernelStart
+				shedExpensiveStep = kernelTime > expensiveStepMs
 				average.push(kernelTime)
 
 				if (average.length >= 30) {

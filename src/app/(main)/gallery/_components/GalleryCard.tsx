@@ -22,6 +22,7 @@ export function GalleryCard(
 				alt={getAlternative(artist, artwork)}
 				width={artwork.shape.x}
 				height={artwork.shape.y}
+				loading="lazy"
 				decoding="async"
 				className="w-full h-full object-cover"
 			/>
