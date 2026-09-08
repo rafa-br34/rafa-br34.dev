@@ -48,7 +48,8 @@ function BlogListEntry({ post }: { readonly post: BlogPost }) {
 					src={`/assets/blogs/${post.id}/${thumbnail}`}
 					alt={`${post.metadata.title} thumbnail`}
 					className="h-full shrink-0 rounded-md border border-theme-bg-2 object-cover"
-					loading="lazy"
+					loading="eager"
+					decoding="sync"
 				/>
 			)}
 		</Link>
