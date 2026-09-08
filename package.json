@@ -59,7 +59,7 @@
 		"@typescript-eslint/eslint-plugin": "^8.69.0",
 		"@typescript-eslint/parser": "^8.69.0",
 		"dprint": "^0.57.1",
-		"eslint": "^9.31.0",
+		"eslint": "^10.10.0",
 		"eslint-plugin-react-hooks": "^7.1.1",
 		"gh-pages": "^6.3.0",
 		"postcss": "^8.5.28",
