@@ -805,7 +805,7 @@ export function SDFInteractiveGraph() {
 	const activeParams = settings.params[activePrimitive.id]
 
 	return (
-		<div className="grid grid-cols-1 gap-2 bg-clip-content rounded-md border border-theme-bg-2 bg-theme-bg-0">
+		<div className="grid grid-cols-1 gap-2 bg-clip-content rounded-md border border-theme-bg-2 bg-theme-bg-0 mb-2">
 			<div className="relative h-120 min-h-0 min-w-0 w-full overflow-hidden rounded-t-md border-b border-theme-bg-2">
 				<canvas ref={canvasRef} className="absolute inset-0 h-full w-full rounded-t-sm" />
 				<div

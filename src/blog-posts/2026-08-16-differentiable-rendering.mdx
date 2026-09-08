@@ -38,31 +38,11 @@ Obviously, we can also negate the function (which would be $z = -D_{Circle}(...)
 Now, if we graph it, we get the following:  
 
 <SDFInteractiveGraph/>
-```
-<SDFInteractiveGraph
-	configs={{
-		bounds: {
-			min: [-100, -100],
-			max: [100, 100],
-		},
-		params: [
-			{id: "x", name: "Px", min: -100, max: 100},
-			{id: "y", name: "Py", min: -100, max: 100},
-			{id: "r", name: "Pr", min: 0, max: 100},
-		],
-		func: (vx, vy, params) => {
-			const dist = (ax, ay, bx, by) => Math.sqrt((ax - bx) ** 2 + (ay - by) ** 2)
-			return params.r - dist(vx, vy, params.x, params.y)
-		},
-	}}
-/>
-```
 
 Now, notice how, when the function isn't normalized, it defines a gradient in which the sign indicates whether we are inside or outside the shape.
 You'll also notice the undulating stripes in the visualization, those are the sine of the function output ($sin(z)$).
 They don't have a specific use in our case, but they do visually encode the gradient field, making it easier to see how the SDF changes smoothly across space.  
-Of course we will lose the full gradients when we squish the function by normalizing it, but the gradients will live within the slope of that normalization function.
-The fact that the magnitude of `z` equals the distance to the closest surface is what makes them so useful for differentiable rendering, because the gradient magnitude is consistent everywhere, it never vanishes or explodes.  
+Of course we will lose the full gradients when we squish the function by normalizing it, but the gradients will live within the slope of that normalization function.  
 Obviously, we aren't limited to just circles, we can make basically any primitive, or make them intersect, unify, subtract, and so much more.  
 For instance:
 
