@@ -248,7 +248,18 @@ function initializeCanvas(
 	params: THREE.WebGLRendererParameters,
 	onResize: () => void,
 ) {
-	const renderer = new THREE.WebGLRenderer({ canvas, ...params })
+	let renderer: THREE.WebGLRenderer
+
+	try {
+		renderer = new THREE.WebGLRenderer({ canvas, ...params })
+	}
+	catch (rendererError) {
+		return {
+			renderer: null as null,
+			rendererError,
+		}
+	}
+
 	renderer.setPixelRatio(window.devicePixelRatio || 1)
 	renderer.setNodesHandler(new WebGLNodesHandler())
 
@@ -485,6 +496,8 @@ export function SDFInteractiveGraph() {
 	const [settings, setSettings] = useState<SdfSettings>(DEFAULT_SETTINGS)
 	const settingsRef = useRef(settings)
 
+	const [rendererFailure, setRendererFailure] = useState<null | Error>(null)
+
 	useEffect(() => {
 		settingsRef.current = settings
 	}, [settings])
@@ -546,7 +559,7 @@ export function SDFInteractiveGraph() {
 
 		const { meshCamera, meshControls, disposeMeshCamera } = hookMeshCamera(canvas)
 
-		const { disposeRenderer, renderer } = initializeCanvas(
+		const { disposeRenderer, renderer, rendererError } = initializeCanvas(
 			canvas,
 			{ alpha: true, antialias: true },
 			() => {
@@ -554,6 +567,11 @@ export function SDFInteractiveGraph() {
 				overlaySizeRef.current = { w: Math.max(1, rect.width), h: Math.max(1, rect.height) }
 			},
 		)
+
+		if (!renderer) {
+			setRendererFailure(rendererError as Error)
+			return
+		}
 
 		const imageCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 2)
 		imageCamera.position.set(0, 0, 1)
@@ -803,6 +821,16 @@ export function SDFInteractiveGraph() {
 
 	const activePrimitive = SDF_PRIMITIVES[settings.mode]
 	const activeParams = settings.params[activePrimitive.id]
+
+	if (rendererFailure) {
+		return (
+			<div className="p-2 gap-2 rounded-md border border-theme-bg-2 mb-2">
+				Failed to acquire ThreeJS renderer.
+				{rendererFailure.name}:
+				{rendererFailure.message}
+			</div>
+		)
+	}
 
 	return (
 		<div className="grid grid-cols-1 gap-2 bg-clip-content rounded-md border border-theme-bg-2 bg-theme-bg-0 mb-2">
