@@ -518,15 +518,17 @@ export function SDFInteractiveGraph() {
 		meshControls.enablePan = true
 		meshControls.rotateSpeed = 0.7
 		meshControls.maxPolarAngle = Math.PI * 0.49
-		meshControls.addEventListener("change", () => {
+		const onControlsChange = () => {
 			viewCenterRef.current.x = meshControls.target.x
 			viewCenterRef.current.z = meshControls.target.z
-		})
+		}
+		meshControls.addEventListener("change", onControlsChange)
 
 		return {
 			meshCamera,
 			meshControls,
 			disposeMeshCamera: () => {
+				meshControls.removeEventListener("change", onControlsChange)
 				meshControls.dispose()
 			},
 		}
@@ -562,8 +564,9 @@ export function SDFInteractiveGraph() {
 		//
 		const fieldMaterials = SDF_PRIMITIVES.map(primitive => buildFieldMaterial(primitive))
 		const fieldScene = new THREE.Scene()
+		const fieldQuadGeo = new THREE.PlaneGeometry(2, 2)
 		const fieldQuad = new THREE.Mesh(
-			new THREE.PlaneGeometry(2, 2),
+			fieldQuadGeo,
 			fieldMaterials[settingsRef.current.mode],
 		)
 		fieldQuad.frustumCulled = false
@@ -609,7 +612,8 @@ export function SDFInteractiveGraph() {
 		// Right viewport: flat 2D field preview
 		//
 		const imageScene = new THREE.Scene()
-		const imageQuad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), imageShader.material)
+		const imageQuadGeo = new THREE.PlaneGeometry(2, 2)
+		const imageQuad = new THREE.Mesh(imageQuadGeo, imageShader.material)
 		imageQuad.frustumCulled = false
 		imageScene.add(imageQuad)
 
@@ -769,7 +773,6 @@ export function SDFInteractiveGraph() {
 
 		return () => {
 			cancelAnimationFrame(animationFrame)
-			disposeRenderer()
 			disposeMeshCamera()
 
 			overlay.removeEventListener("wheel", onWheel)
@@ -778,6 +781,8 @@ export function SDFInteractiveGraph() {
 			overlay.removeEventListener("pointerup", onPointerUp)
 			overlay.removeEventListener("pointercancel", onPointerUp)
 
+			// Free GPU resources first (while the renderer's dispose listeners
+			// are still wired up), then the renderer + observer last.
 			for (const material of fieldMaterials) {
 				material.dispose()
 			}
@@ -786,7 +791,11 @@ export function SDFInteractiveGraph() {
 			planeMat.dispose()
 			imageShader.material.dispose()
 			unitGeo.dispose()
+			fieldQuadGeo.dispose()
+			imageQuadGeo.dispose()
 			fieldTarget.dispose()
+
+			disposeRenderer()
 
 			mountedRef.current = false
 		}
