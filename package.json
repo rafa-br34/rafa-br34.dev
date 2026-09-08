@@ -71,6 +71,6 @@
 	},
 	"allowScripts": {
 		"sharp@0.34.5": true,
-		"dprint@0.55.2": true
+		"dprint@0.57.1": true
 	}
 }
