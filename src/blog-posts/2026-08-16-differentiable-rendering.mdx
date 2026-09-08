@@ -66,7 +66,7 @@ Where $a,b$ are two SDFs
 ### Defining the grid
 
 Much like in GPUs were each pixel is evaluated in parallel, the exact same can be done in PyTorch.  
-So we can begin by defining a grid with size (width, height) in the range (0-width, 0-height), like so:  
+So we can begin by defining a grid with size (width, height) in the range (0 to (width - 1), 0 to (height - 1)), like so:  
 
 ```py
 import torch
