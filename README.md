@@ -52,5 +52,6 @@ Then run `emsdk activate --permanent/--system` and after that select the WebAsse
 
 GitHub Pages was abandoned because of its ~500 MB artifact limit.  
 Cloudflare Pages has no total-size cap (20k files 25MiB each).  
+Plus Cloudflare Pages is wayyy faster in terms of bandwidth, so why not?  
 
 `next dev --webpack` writes its cache into `dist/dev/` because `distDir` is `"dist"`. If you deploy without a clean build, that cache (single files >100 MB) gets uploaded and fails.

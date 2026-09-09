@@ -20,9 +20,8 @@ import { visit } from "unist-util-visit"
 import type { VFile } from "vfile"
 
 /**
- * Assets folder of the post currently being compiled, derived from its file
- * name (e.g. `2026-08-16-differentiable-rendering.mdx`). Falls back to the
- * frontmatter `id` (set by remark-mdx-frontmatter).
+ * Assets folder of the post currently being compiled, derived from its file name.
+ * Falls back to the frontmatter `id` (set by remark-mdx-frontmatter).
  */
 function postAssetsBase(file: VFile): string | null {
 	const fileName = path.basename(file.path ?? "")
