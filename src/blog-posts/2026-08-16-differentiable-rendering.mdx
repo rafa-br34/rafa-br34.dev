@@ -1,6 +1,6 @@
 ---
 title: Exploring 2D differentiable rendering
-desc: Going in-depth how 2D differentiable rendering/rasterization works and reimplementing it using PyTorch.
+desc: Going in depth on how 2D differentiable rendering/rasterization works and reimplementing it using PyTorch.
 date: 2026-08-16T16:40-03:00
 edit: 2026-09-05T23:26-03:00
 tags: ["ai/ml", "rasterization", "gradients"]
@@ -13,19 +13,19 @@ id: "2026-08-16-differentiable-rendering"
 ## Introduction
 
 In its most fundamental form, the core idea behind differentiable rendering (DR) is to reformulate/approximate the rendering function so that the output pixels are continuous and smooth (differentiable) with respect to the input parameters (which can be 3D/2D geometry, lighting conditions, material properties, camera positioning, etc).  
-Now, by itself, differentiable rendering won't solve all problems depending on what your input represents, for instance, if you're solving for 2D geometry and a shape is on top of another shape, the optimizer will have basically no knowledge of the shape underneath since it's not affecting anything in the output image (thus you get zero gradients for the shape underneath). While this is a fundamental limitation of 2D rendering, there are fixes for such issues (e.g., enforcing a small baseline transparency or soft opacity prior).  
+Now, by itself, differentiable rendering won't solve all problems depending on what your input represents; for instance, if you're solving for 2D geometry and a shape is on top of another shape, the optimizer will have basically no knowledge of the shape underneath since it's not affecting anything in the output image (thus you get zero gradients for the shape underneath). While this is a fundamental limitation of 2D rendering, there are fixes for such issues (e.g., enforcing a small baseline transparency or soft opacity prior).  
 
 ## Signed distance functions (SDFs)
 
 SDFs play a huge part in 2D differentiable rendering (and I'd guess 3D DR too), so we first have to understand how they work.  
-In principle, SDFs are really simple: we just want to define a function that, given `x`, `y`, and whatever other parameters your primitive needs (e.g., `Px`, `Py`, `Pradius` for a circle) it returns a new `z` value.  
-If this `z` value is positive (>0) then we're inside the primitive, otherwise if it is negative (\<0) we're outside the primitive (hence the *signed* in the name).  
+In principle, SDFs are really simple: we just want to define a function that, given `x`, `y`, and whatever other parameters your primitive needs (e.g., `Px`, `Py`, `Pradius` for a circle), it returns a new `z` value.  
+If this `z` value is positive (>0), then we're inside the primitive; otherwise, if it is negative (\<0), we're outside the primitive (hence the *signed* in the name).  
 
 > [!IMPORTANT]
 > Sign conventions change across the literature.  
 > What I will be using here (positive inside, negative outside) is perfectly valid. But most adopt the opposite (negative inside, positive outside).  
 > The boundary is always at $z = 0$, so this choice doesn't affect the output. It just flips the gradient direction during optimization.  
-> It is definitely something to be aware of though.
+> It is definitely something to be aware of, though.
 
 For example, to define a circle, we can use the following:  
 
@@ -40,10 +40,10 @@ Now, if we graph it, we get the following:
 <SDFInteractiveGraph/>
 
 Now, notice how, when the function isn't normalized, it defines a gradient in which the sign indicates whether we are inside or outside the shape.
-You'll also notice the undulating stripes in the visualization, those are the sine of the function output ($sin(z)$).
+You'll also notice the undulating stripes in the visualization; those are the sine of the function output ($sin(z)$).
 They don't have a specific use in our case, but they do visually encode the gradient field, making it easier to see how the SDF changes smoothly across space.  
-Of course we will lose the full gradients when we squish the function by normalizing it, but the gradients will live within the slope of that normalization function.  
-Obviously, we aren't limited to just circles, we can make basically any primitive, or make them intersect, unify, subtract, and so much more.  
+Of course, we will lose the full gradients when we squish the function by normalizing it, but the gradients will live within the slope of that normalization function.  
+Obviously, we aren't limited to just circles; we can make basically any primitive, or make them intersect, unify, subtract, and so much more.  
 For instance:
 
 | Operation    | Function (>0 in, \<0 out) | Function (\<0 in, >0 out) |
@@ -55,7 +55,7 @@ For instance:
 Where $a,b$ are two SDFs
 
 > [!TIP]
-> If you want a short example of what SDFs are capable of, check Inigo Quilez's [articles](https://iquilezles.org/articles/) about SDFs, they have SDF collections for both [2D](https://iquilezles.org/articles/distfunctions2d/) and [3D](https://iquilezles.org/articles/distfunctions/) SDFs plus tons of more impressive works.
+> If you want a short example of what SDFs are capable of, check Inigo Quilez's [articles](https://iquilezles.org/articles/) about SDFs; they have SDF collections for both [2D](https://iquilezles.org/articles/distfunctions2d/) and [3D](https://iquilezles.org/articles/distfunctions/) SDFs, plus tons of more impressive works.
 
 ## SDFs in PyTorch
 
@@ -65,7 +65,7 @@ Where $a,b$ are two SDFs
 
 ### Defining the grid
 
-Much like in GPUs were each pixel is evaluated in parallel, the exact same can be done in PyTorch.  
+Much like in GPUs, where each pixel is evaluated in parallel, the exact same can be done in PyTorch.  
 So we can begin by defining a grid with size (width, height) in the range (0 to (width - 1), 0 to (height - 1)), like so:  
 
 ```py
@@ -107,9 +107,9 @@ plt.close()
 This gives us the following:
 ![Grid graphed across x, y, and the two summed](grid-graph.png)
 
-### Applying a SDF function to it
+### Applying an SDF function to it
 
-Now we can simply apply a SDF function to each one of those values (much like how you would do in a GPU shader).  
+Now we can simply apply an SDF function to each one of those values (much like how you would do in a GPU shader).  
 So using the following code:
 
 ```py
@@ -155,16 +155,16 @@ plt.show()
 plt.close()
 ```
 
-This pretty much just evaluates the SDF for every point in our grid, so we're feeding that entire 64x64 grid to the SDF, the SDF calculates a new value (our $z$) for every point, and returns a new 64x64 grid.
+This pretty much just evaluates the SDF for every point in our grid, so we're feeding that entire 64x64 grid to the SDF; the SDF calculates a new value (our $z$) for every point and returns a new 64x64 grid.
 
 We get the following:
 ![SDF normalization using various functions](sdf-normalization-demo.png)
 
-I don't think I need to mention this, you are not limited to these functions, you can use practically any normalization function (keep in mind it might change how things work drastically even if visually it looks the same, we will see this happening in action later on).
+I don't think I need to mention this; you are not limited to these functions. You can use practically any normalization function (keep in mind it might change how things work drastically even if visually it looks the same; we will see this happening in action later on).
 
 ### Creating a simple target image
 
-So we have to define a target to optimize for, lets begin by just using a circle (which can be defined by our own circle SDF).
+So we have to define a target to optimize for; let's begin by just using a circle (which can be defined by our own circle SDF).
 
 ```py
 target = sdf_circle(grid_x, grid_y, pos_x * 1.5, pos_y * 1.5, radius).clamp(-1, 1) / 2 + 0.5
@@ -182,21 +182,21 @@ plt.close()
 
 ### Visualizing the function gradients
 
-Now before our first training run, I think it would be neat to see how the gradients vary across the functions.  
+Now, before our first training run, I think it would be neat to see how the gradients vary across the functions.  
 The good thing about circles is that we only have 3 parameters that we can touch ($p_x$, $p_y$, $p_r$), thus we can lock $p_r$ and create a 2D vector field to see how the gradients will flow.  
 
 So how do we do that?
-Well it's actually quite straightforward:  
+Well, it's actually quite straightforward:  
 
-1. The gradient is basically back-propagation telling us how we should change our parameters (so it's a delta). Thus we start by defining a tensor that stores that delta (same size as the amount of parameters), for every sample we want to get, and for every type of function we have (which is 6: `raw`, `atan`, `atanx4`, `tanh`, `sigmoid`, `smoothstep`). We do the same with loss, but loss is accounted by a single number.
-2. We iterate every point we would like to sample and track their index (we have to know which sample the current gradient vector and loss belongs to).
-3. We define our parameters for the current sample. In this case it is the current circle position (so $p_x$ and $p_y$).
+1. The gradient is basically back-propagation telling us how we should change our parameters (so it's a delta). Thus, we start by defining a tensor that stores that delta (same size as the number of parameters), for every sample we want to get and for every type of function we have (which is 6: `raw`, `atan`, `atanx4`, `tanh`, `sigmoid`, `smoothstep`). We do the same with loss, but loss is represented by a single number.
+2. We iterate over every point we would like to sample and track its index (we have to know which sample the current gradient vector and loss belong to).
+3. We define our parameters for the current sample. In this case, it is the current circle position (so $p_x$ and $p_y$).
 4. We compute `sdf_raw` and then every other function type.
 5. Now things get interesting because we call `write_grad`. The first arguments are just info about which sample we're solving for, then the resulting value from our function, and finally the parameters we want to get the gradients for.
-6. Inside `write_grad` we calculate the L2 loss and get the gradients using `torch.autograd.grad`, this function is very interesting because it only differentiates for parameters we manually gave it (the `params` variable, so $p_x$ and $p_y$), it then returns the gradients as a list of tensors. At no point do we have to deal with hidden states, `.grad.zero_()`, or something else. We also have to use `retain_graph = True` otherwise PyTorch would free the compute graph after the first `torch.autograd.grad` call.
+6. Inside `write_grad` we calculate the L2 loss and get the gradients using `torch.autograd.grad`. This function is very interesting because it only differentiates for parameters we manually gave it (the `params` variable, so $p_x$ and $p_y$), it then returns the gradients as a list of tensors. At no point do we have to deal with hidden states, `.grad.zero_()`, or anything else. We also have to use `retain_graph = True` otherwise, PyTorch would free the compute graph after the first `torch.autograd.grad` call.
 7. We then store those values and graph them.
 
-I won't get into the graphing part because it's really just about negating the gradients (by default the gradients go *up* we want to go *down*), scaling them, and plotting them.
+I won't get into the graphing part because it's really just about negating the gradients (by default the gradients go *up*; we want to go *down*), scaling them, and plotting them.
 
 ```py
 # [types, grid_x, grid_y, parameters]
@@ -281,14 +281,14 @@ plt.close()
 This gives us the following graph (feel free to zoom in):
 ![Gradients created using the circle SDF function](gradients-2d.png)
 
-Now even with just this graph we can see some very interesting things and possible issues.  
+Now, even with just this graph, we can see some very interesting things and possible issues.  
 What I would like to point out is:  
 
-1. How with the raw non-normalized SDF we get a direct un-scaled gradient to the target, which is way stronger than with normalization. This makes sense, because the $z$ value that our SDF returns represents the distance to 0. Obviously since our optimization target doesn't operate in the same range as the SDF (the numerical range for our target is 0 to 1, while SDFs don't have a singular range) the solution with the lowest loss is to set the circle in the middle.
-2. All functions give us valid gradients only around their optimization range, with the exception of `atan` and `atanx4` which provides decent gradients for a bigger range than the others (which makes sense since it decays slowly).
+1. How, with the raw non-normalized SDF, we get a direct unscaled gradient to the target, which is way stronger than with normalization. This makes sense, because the $z$ value that our SDF returns represents the distance to 0. Obviously, since our optimization target doesn't operate in the same range as the SDF (the numerical range for our target is 0 to 1, while SDFs don't have a singular range), the solution with the lowest loss is to set the circle in the middle.
+2. All functions give us valid gradients only around their optimization range, except `atan` and `atanx4` which provide decent gradients for a bigger range than the others (which makes sense since it decays slowly).
 3. How the truly meaningful gradients are close to the optimization target.
 
-Now even with these issues, these functions will probably all perform relatively well because that they produce a small area around them with decent gradients. While this would be a deal breaker basically anywhere else in ML, in this scenario we don't actually need fully continuous gradients, because having the optimizer trying to optimize every shape for the entire image is unnecessary. This way the optimizer will try to fit shapes to their closest pixel.  
+Now even with these issues, these functions will probably all perform relatively well because they produce a small area around them with decent gradients. While this would be a deal breaker basically anywhere else in ML, in this scenario we don't actually need fully continuous gradients, because having the optimizer trying to optimize every shape for the entire image is unnecessary. This way, the optimizer will try to fit shapes to their closest pixel.  
 We will actually see this exact issue of the optimizer being "too greedy" happening with `atan` and `atanx4` later on.  
 
 ### First test runs
@@ -440,13 +440,13 @@ perform_combination_test(
 ```
 
 We will initialize our circle with $p_x = 30, p_y = 30$ (labeled as centered in the graph).  
-To begin with let's see how RMSprop compares with Adam.  
+To begin with, let's see how RMSprop compares with Adam.  
 Here's RMSprop:
 ![RMSprop comparison](test-run-centered-rmsprop.webp)
 And here's Adam:
 ![Adam comparison](test-run-centered-adam.webp)
-From our very limited sample size and choice of parameters we can tell that Adam does perform slightly better than RMSprop, although RMSprop converges impressively fast while Adam takes its time, which is interesting, probably because of Adam's momentum. It's also interesting to see that `atanx4` fails with RMSprop but converges with Adam.  
-Of course though we can't really make many meaningful conclusions from tests like this.  
+From our very limited sample size and choice of parameters, we can tell that Adam does perform slightly better than RMSprop, although RMSprop converges impressively fast while Adam takes its time, which is interesting, probably because of Adam's momentum. It's also interesting to see that `atanx4` fails with RMSprop but converges with Adam.  
+Of course, though, we can't really make many meaningful conclusions from tests like this.  
 It's also worth noting that while in this test RMSprop fails on both `smoothstep` and `atanx` in a real scenario it would zero the radius on that circle, effectively signaling it doesn't need it anymore. That's by no means better than it converging, but it's something.
 
 > [!TIP]
@@ -456,11 +456,11 @@ It's also worth noting that while in this test RMSprop fails on both `smoothstep
 Now we know what happens when the circle is inside the area of valid gradients, but what happens if it isn't?  
 Here we are using $p_x = 48, p_y = 48$
 ![Adam trying to optimize when the circle is closer to the corner](test-run-offcenter-adam.webp)
-Well, that's interesting, `atan` and `atanx4` converge, makes because their gradients propagate a lot further than the other functions.  
+Well, that's interesting, `atan` and `atanx4` converge because their gradients propagate a lot further than the other functions.  
 
 ### Multiple objects
 
-So now that we have the foundations down lets use multiple objects and a different line SDF.
+So now that we have the foundations down, let's use multiple objects and a different line SDF.
 
 We can define it like so:
 
@@ -513,10 +513,10 @@ Notice how we're using a simple `.max(dim = -1).values` to make a union of all o
 That gives us the following:
 ![Star using 4 SDF line segments](sdf-normalization-demo-lines.png)
 
-Using the exact same method for the circle SDF we can make it into an optimization target:
+Using the same method for the circle SDF, we can make it into an optimization target:
 ![Optimization target using the SDF line segments](image-target-lines.png)
 
-And once again, we can optimize for it
+And once again, we can optimize for it.
 
 ```py
 line_init_table = {
@@ -614,8 +614,8 @@ Which gives us the following, starting with Adam:
 And then AdamW (because we haven't tested it yet):
 ![AdamW optimizing for 4 lines in a star configuration](line-run-rand-adamw.webp)
 
-Adam and AdamW perform nearly identically in this case. It's also interesting to note how `sigmoid` surprisingly manages to converge on both Adam and AdamW, it also wins basically over all other functions, maybe with the exception of `atanx4`.  
-Interestingly `smoothstep` and `atan` fail to converge on both, so maybe `atan`'s gradients aren't that good at all.  
+Adam and AdamW perform nearly identically in this case. It's also interesting to note how `sigmoid` surprisingly manages to converge on both Adam and AdamW; it also wins basically over all other functions, maybe with the exception of `atanx4`.  
+Interestingly, `smoothstep` and `atan` fail to converge on both, so maybe `atan`'s gradients aren't that good at all.  
 
 So now lets see how `atan(xn)` ($\frac{\arctan(x \cdot n)}{\pi} + 0.5$) performs
 ![Adam optimizing using atanxn](line-run-atanxn-adam.webp)
@@ -624,9 +624,9 @@ Only `atan` and `atanx3` fail to converge.
 
 ### Going Technicolor
 
-Now with the optimization fundamentals out of the way lets add color.  
-Adding color is quite straightforward since our `sdf_lines` function returns a tensor of size `[W, H, M]` where `M` is the amount of lines we have.  
-So we can use a static canvas and basically write each shape into it, by first subtracting our shape from the canvas (so we get a black void where our shape would go) and then adding it into the canvas (thus filling the void with our shape).  
+Now with the optimization fundamentals out of the way, let's add color.  
+Adding color is quite straightforward since our `sdf_lines` function returns a tensor of size `[W, H, M]` where `M` is the number of lines we have.  
+So we can use a static canvas and basically write each shape into it by first subtracting our shape from the canvas (so we get a black void where our shape would go) and then adding it to the canvas (thus filling the void with our shape).  
 
 So this simple function is all we need:
 
@@ -652,14 +652,14 @@ def sdf_compose(masks, colors, bg_color):
 > canvas = canvas * (1 - blend) + color * blend
 > ```
 
-With that we achieve colored SDFs, as we can see:
+With that, we achieve colored SDFs, as we can see:
 ![RGB composed SDFs](rgb-composition.png)
 
 Here's an animation to better visualize the whole "create shape silouette, then color and fill it" concept:
 ![RGB SDF composition animation](rgb-composition-animated.webp)
-Of course the `raw` canvas is completely broken because we're passing the raw non-normalized SDF values. Which is why it blends improperly.
+Of course, the `raw` canvas is completely broken because we're passing the raw, non-normalized SDF values. Which is why it blends improperly.
 
-And for completeness sake the full code used:
+And for completeness sake, the full code used:
 
 ```py
 def sdf_compose(masks, colors, bg_color):
@@ -753,9 +753,9 @@ Once again, we create a target:
 And then we optimize for it:  
 ![Colored lines optimization](line-rgb-run-rand-adam.webp)
 
-And again `sigmoid` is the one that gets the closest to convergence first, surprisingly most of the functions get close to convergence, but sigmoid gets there pretty fast.  
-You also might have noticed that it's a lot slower now, that's because I dropped the LR since the previous value was too violent for this many variables.  
-It's also worth noting that it uses 2 lines for the diagonal line instead of 1, while wasteful, this is a totally valid approach to optimizing this problem.  
+And again, `sigmoid` is the one that gets closest to convergence first. Surprisingly, most of the functions get close to convergence, but sigmoid gets there pretty fast.  
+You also might have noticed that it's a lot slower now; that's because I dropped the LR since the previous value was too violent for this many variables.  
+It's also worth noting that it uses 2 lines for the diagonal line instead of 1; while wasteful, this is a totally valid approach to optimizing this problem.  
 Here's how it looks when using $\arctan(x \cdot n)$:
 ![Colored lines optimization using atanxn](line-rgb-run-atanxn-adam.webp)
 
@@ -767,9 +767,9 @@ Clearly the LR is too high, but even then it does give interesting results.
 
 ## Large scale demo
 
-Now with the fundamentals out of the way we can finally scale up to real images.  
+Now with the fundamentals out of the way, we can finally scale up to real images.  
 
-For that I will use these images as optimization targets:  
+For that, I will use these images as optimization targets:  
 <img alt="Image of my OC as the first optimization target" src="optim_target_o_pastelzera_headshot.png" height="200" style={{height: 200}}/>
 <img alt="Image of my OC as the second optimization target" src="optim_target_gummi_art.png" height="200" style={{height: 200}}/>
 
@@ -1043,11 +1043,11 @@ torch.save(
 ```
 
 
-And well.. It does work..
+And well.. It does work.
 
 ### Normalization tests
 
-So to begin with I tested multiple normalizations.  
+So to begin with, I tested multiple normalizations.  
 Here are the results, from worst to best
 
 `atan`:  
@@ -1070,9 +1070,9 @@ Here are the results, from worst to best
 ![optim_target_o_pastelzera_headshot.png norm_sigmoid final result](out-optim_target_o_pastelzera_headshot.png-norm_sigmoid-1788407794-final.png)
 ![optim_target_o_pastelzera_headshot.png norm_sigmoid animated result](out-optim_target_o_pastelzera_headshot.png-norm_sigmoid-1788407794-animated.webp)
 
-From these results we can clearly see that `smoothstep`, `tanh`, and `sigmoid` work the best. While `atan` and `atanx` fail very poorly at it.  
-Now to me personally it isn't 100% clear why `atan` and `atanx` fails this badly.
-But I think it's somewhat safe to assume that that's caused because `atan` decays slowly, which causes the optimizer to try and optimize for "everything" at once, thus resulting in a very mediocre average.
+From these results, we can clearly see that `smoothstep`, `tanh`, and `sigmoid` work the best. While `atan` and `atanx` fail very poorly at it.  
+Now, to me personally, it isn't 100% clear why `atan` and `atanx` fail this badly.
+But I think it's somewhat safe to assume that that's because `atan` decays slowly, which causes the optimizer to try and optimize for "everything" at once, thus resulting in a very mediocre average.
 
 ### Final results
 
@@ -1091,31 +1091,31 @@ But I think it's somewhat safe to assume that that's caused because `atan` decay
 
 ## Possible improvements
 
-So.. we have proven it works, and the idea *is* solid.  
+So... we have proven it works, and the idea *is* solid.  
 So what's next?  
 
-1. We barely touched the hyper-parameters, optimizers, and how initialization is performed.  
-We also have seen that `sigmoid` does overall end up with a better generalization, but `smoothstep` gives us crispy edges. So what if we mix them both?  
-We could also try to optimize in multiple steps, instead of doing it in one go we do smaller optimization runs each one trying to decrease the difference of the target image.
-2. It *urgently* needs to be optimized, we are allocating a tensor of size `WxH` for *every* line, no matter if that line is visible or has a radius of zero. Which as you can imagine isn't great when we're trying to optimize thousands of lines on larger images (a 550x220 image with 5k lines takes up basically 30GiB of VRAM, which shows its innefficiencies).  
-We can optimize it by splitting the area in which lines reside by 4 quadrants in the image, but this also has its own drawbacks (how will we deal with lines that go outside those quadrants?).  
-Another way is to perform bucketing, why allocate a huge `NxWxH` tensor when we can allocate a `Nx16x16` tensor for all primitives that use less than 16x16 of screen space?  
-I'm pretty sure DiffVG and alike are clever enough to pretty much not have this issue, but I haven't studied them in-depth yet so I can't say for certain.
+1. We barely touched the hyperparameters, optimizers, and how initialization is performed.  
+We have also seen that `sigmoid` does overall end up with better generalization, but `smoothstep` gives us crisp edges. So what if we mix them both?  
+We could also try to optimize in multiple steps; instead of doing it in one go, we do smaller optimization runs, each one trying to decrease the difference from the target image.
+2. It *urgently* needs to be optimized; we are allocating a tensor of size `WxH` for *every* line, no matter if that line is visible or has a radius of zero. Which, as you can imagine, isn't great when we're trying to optimize thousands of lines on larger images (a 550x220 image with 5k lines takes up basically 30GiB of VRAM, which shows its inefficiencies).  
+We can optimize it by splitting the area in which lines reside into 4 quadrants in the image, but this also has its own drawbacks (how will we deal with lines that go outside those quadrants?).  
+Another way is to perform bucketing: why allocate a huge `NxWxH` tensor when we can allocate a `Nx16x16` tensor for all primitives that use less than 16x16 of screen space?  
+I'm pretty sure DiffVG and similar are clever enough to pretty much not have this issue, but I haven't studied them in-depth yet, so I can't say for certain.
 3. Doing cooler stuff.  
-No but seriously, so far we just have optimized 2D images into 2D images, this same idea can be used for 3D geometry.
+No, but seriously, so far we just have optimized 2D images into 2D images; this same idea can be used for 3D geometry.
 However, that will be for a much later date.
 
-Of course we could solve most of these problems just by cloning DiffVG, but what's the fun in that?  
+Of course, we could solve most of these problems just by cloning DiffVG, but what's the fun in that?  
 I would much rather test out [triton](https://triton-lang.org/main/index.html) or [taichi](https://www.taichi-lang.org/) than just compiling DiffVG.  
 That would also mean finding out the derivatives of complex functions by hand, but that's something I will need to learn one time or another either way.
 
 ## Conclusion
 
-Well this concludes this blog post, I believe that differentiable rendering perfectly illustrates how there really isn't a true right or wrong in ML, and that things that work great in one scenario work completely different in another.  
-To give my own personal opinion about this, it isn't just about how useful differentiable rendering truly is, I think this is more about understanding and demonstrating why gradient descent is such a powerful algorithm for optimization problems.
+Well, this concludes this blog post. I believe that differentiable rendering perfectly illustrates how there really isn't a true right or wrong in ML, and that things that work great in one scenario work completely differently in another.  
+To give my own personal opinion about this, it isn't just about how useful differentiable rendering truly is. I think this is more about understanding and demonstrating why gradient descent is such a powerful algorithm for optimization problems.
 As you can imagine, this isn't limited to just optimizing lines to raster images.
 
 ## Acknowledgements
 
-Special thanks to [Exulan](https://exulan.com) for providing the compute resources needed this!  
+Special thanks to [Exulan](https://exulan.com) for providing the compute resources needed for this!  
 Demonstration images used courtesy of [o_pastelzera](https://linktr.ee/o_pastelzera) and [Gummi_art](https://bsky.app/profile/gummiart.bsky.social).
